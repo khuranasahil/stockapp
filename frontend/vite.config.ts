@@ -4,18 +4,21 @@ import { defineConfig } from "vite"
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
   server: {
+    host: true,
+    strictPort: true,
+    port: 5173,
     proxy: {
       '/api': {
         target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
         secure: false,
       },
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 })
