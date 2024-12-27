@@ -1,7 +1,11 @@
 import { useState } from 'react'
+import { useTheme } from 'next-themes'
+import { Moon, Sun, Loader2 } from 'lucide-react'
 import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
+import { ScrollArea } from "./components/ui/scroll-area"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface StockData {
   pagination: {
@@ -23,6 +27,7 @@ interface StockData {
 }
 
 function App() {
+  const { theme, setTheme } = useTheme()
   const [tickers, setTickers] = useState('')
   const [stockData, setStockData] = useState<StockData | null>(null)
   const [loading, setLoading] = useState(false)
@@ -42,19 +47,17 @@ function App() {
 
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}/api/stocks/eod?symbols=${tickers}`;
-      console.log('Fetching from:', url);
-      console.log('Environment:', import.meta.env);
-      
-      // TODO: SSL certificate validation is disabled for development purposes only.
-      // This should be properly configured with valid certificates in production.
       console.log('Making request to:', url);
-      // TODO: Remove this in production. Only for development with self-signed certificate
+      
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
+      };
+      
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
+        headers,
         mode: 'cors'
       });
       console.log('Response status:', response.status);
@@ -77,13 +80,25 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
-      <Card className="w-full max-w-6xl">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+      <Card className="w-full max-w-6xl dark:bg-gray-800 dark:text-gray-100">
         <CardHeader>
-          <CardTitle className="text-2xl">Stock Market Data</CardTitle>
-          <CardDescription>
-            Enter stock tickers separated by commas (e.g., AAPL, MSFT, GOOGL)
-          </CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-2xl dark:text-gray-100">Stock Market Data</CardTitle>
+              <CardDescription className="dark:text-gray-300">
+                Enter stock tickers separated by commas (e.g., AAPL, MSFT, GOOGL)
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="dark:bg-gray-700 dark:hover:bg-gray-600"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 mb-6">
@@ -91,49 +106,130 @@ function App() {
               placeholder="Enter stock tickers..."
               value={tickers}
               onChange={(e) => setTickers(e.target.value)}
-              className="flex-1"
+              className="flex-1 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
             />
             <Button 
               onClick={handleSubmit}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
               disabled={loading}
             >
-              {loading ? 'Loading...' : 'Get Stock Data'}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="dark:text-gray-300">Loading...</span>
+                </span>
+              ) : (
+                'Get Stock Data'
+              )}
             </Button>
           </div>
 
           {error && (
-            <div className="text-red-500 mb-4">{error}</div>
+            <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>
           )}
 
           {stockData && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="p-2 text-left">Symbol</th>
-                    <th className="p-2 text-left">Date</th>
-                    <th className="p-2 text-left">Open</th>
-                    <th className="p-2 text-left">High</th>
-                    <th className="p-2 text-left">Low</th>
-                    <th className="p-2 text-left">Close</th>
-                    <th className="p-2 text-left">Volume</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stockData.data.map((item, index) => (
-                    <tr key={index} className="border-t">
-                      <td className="p-2">{item.symbol}</td>
-                      <td className="p-2">{new Date(item.date).toLocaleDateString()}</td>
-                      <td className="p-2">${item.open.toFixed(2)}</td>
-                      <td className="p-2">${item.high.toFixed(2)}</td>
-                      <td className="p-2">${item.low.toFixed(2)}</td>
-                      <td className="p-2">${item.close.toFixed(2)}</td>
-                      <td className="p-2">{item.volume.toLocaleString()}</td>
+            <ScrollArea className="h-[300px] rounded-md border dark:border-gray-700">
+              <div className="p-4">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-gray-700">
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">Symbol</th>
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">Date</th>
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">Open</th>
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">High</th>
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">Low</th>
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">Close</th>
+                      <th className="p-3 text-left dark:text-gray-100 font-medium">Volume</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {stockData.data.map((item, index) => (
+                      <tr key={index} className="border-t dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="p-3 dark:text-gray-200">{item.symbol}</td>
+                        <td className="p-3 dark:text-gray-200">{new Date(item.date).toLocaleDateString()}</td>
+                        <td className="p-3 dark:text-gray-200">${item.open.toFixed(2)}</td>
+                        <td className="p-3 dark:text-gray-200">${item.high.toFixed(2)}</td>
+                        <td className="p-3 dark:text-gray-200">${item.low.toFixed(2)}</td>
+                        <td className="p-3 dark:text-gray-200">${item.close.toFixed(2)}</td>
+                        <td className="p-3 dark:text-gray-200">{item.volume.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </ScrollArea>
+          )}
+
+          {stockData && stockData.data && stockData.data.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold mb-4 dark:text-gray-100">Stock Price History</h3>
+              <div className="w-full h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={stockData.data.map(d => ({
+                      date: new Date(d.date).toLocaleDateString(),
+                      close: d.close,
+                      open: d.open,
+                      high: d.high,
+                      low: d.low
+                    }))}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke={theme === 'dark' ? '#9CA3AF' : '#4B5563'}
+                    />
+                    <YAxis 
+                      stroke={theme === 'dark' ? '#9CA3AF' : '#4B5563'}
+                      tickFormatter={(value) => `$${value.toFixed(2)}`}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
+                        border: '1px solid #374151',
+                        borderRadius: '0.375rem'
+                      }}
+                      labelStyle={{
+                        color: theme === 'dark' ? '#E5E7EB' : '#111827'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="close" 
+                      stroke="#8B5CF6" 
+                      strokeWidth={2}
+                      dot={false}
+                      name="Close Price"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="open" 
+                      stroke="#10B981" 
+                      strokeWidth={2}
+                      dot={false}
+                      name="Open Price"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="high" 
+                      stroke="#F59E0B" 
+                      strokeWidth={2}
+                      dot={false}
+                      name="High"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="low" 
+                      stroke="#EF4444" 
+                      strokeWidth={2}
+                      dot={false}
+                      name="Low"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           )}
         </CardContent>
