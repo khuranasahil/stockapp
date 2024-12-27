@@ -1,0 +1,41 @@
+{
+    "family": "stockapp",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::481665085747:role/stockapp-ecs-execution-role",
+    "containerDefinitions": [
+        {
+            "name": "stockapp-backend",
+            "image": "481665085747.dkr.ecr.us-east-2.amazonaws.com/stockapp-backend:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "SPRING_PROFILES_ACTIVE",
+                    "value": "prod"
+                },
+                {
+                    "name": "MARKETSTACK_API_KEY",
+                    "value": "83c8eb73c602dc78f07f9235123411b4"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/stockapp",
+                    "awslogs-region": "us-east-2",
+                    "awslogs-stream-prefix": "stockapp"
+                }
+            }
+        }
+    ]
+}
