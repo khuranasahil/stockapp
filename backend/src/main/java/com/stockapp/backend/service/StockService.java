@@ -46,8 +46,16 @@ public class StockService {
                             System.err.println("Server Error Response: " + error);
                             return Mono.error(new RuntimeException("Server Error: " + error));
                         }))
-                .bodyToMono(StockData.class)
-                .doOnNext(data -> System.out.println("Received response: " + data))
+                .bodyToMono(String.class)
+                .doOnNext(rawResponse -> {
+                    System.out.println("Raw API Response: " + rawResponse);
+                    // TODO: Parse response and map to StockData
+                })
+                .map(rawResponse -> {
+                    // Temporary placeholder response for debugging
+                    StockData mockData = new StockData();
+                    return mockData;
+                })
                 .doOnError(error -> System.err.println("Error fetching stock data: " + error.getMessage()))
                 .block();
         } catch (Exception e) {
