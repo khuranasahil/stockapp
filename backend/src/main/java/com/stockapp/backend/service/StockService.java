@@ -34,29 +34,32 @@ public class StockService {
                 .get()
                 .uri(url)
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError(),
-                    response -> response.bodyToMono(String.class)
-                        .flatMap(error -> {
-                            System.err.println("Client Error Response: " + error);
-                            return Mono.error(new RuntimeException("Client Error: " + error));
-                        }))
-                .onStatus(status -> status.is5xxServerError(),
-                    response -> response.bodyToMono(String.class)
-                        .flatMap(error -> {
-                            System.err.println("Server Error Response: " + error);
-                            return Mono.error(new RuntimeException("Server Error: " + error));
-                        }))
                 .bodyToMono(String.class)
                 .doOnNext(rawResponse -> {
                     System.out.println("Raw API Response: " + rawResponse);
-                    // TODO: Parse response and map to StockData
                 })
                 .map(rawResponse -> {
-                    // Temporary placeholder response for debugging
-                    StockData mockData = new StockData();
-                    return mockData;
+                    try {
+                        return new com.fasterxml.jackson.databind.ObjectMapper().readValue(rawResponse, StockData.class);
+                    } catch (Exception e) {
+                        System.err.println("Error parsing response: " + e.getMessage());
+                        System.err.println("Raw response: " + rawResponse);
+                        throw new RuntimeException("Failed to parse API response", e);
+                    }
                 })
-                .doOnError(error -> System.err.println("Error fetching stock data: " + error.getMessage()))
+                .doOnNext(response -> {
+                    System.out.println("Successfully parsed response with " + 
+                        (response.getData() != null ? response.getData().size() : 0) + 
+                        " stock entries");
+                })
+                .doOnError(error -> {
+                    System.err.println("Error fetching stock data: " + error.getMessage());
+                    if (error instanceof org.springframework.web.reactive.function.client.WebClientResponseException) {
+                        org.springframework.web.reactive.function.client.WebClientResponseException webError = 
+                            (org.springframework.web.reactive.function.client.WebClientResponseException) error;
+                        System.err.println("Response body: " + webError.getResponseBodyAsString());
+                    }
+                })
                 .block();
         } catch (Exception e) {
             System.err.println("Exception in getEodData: " + e.getMessage());
