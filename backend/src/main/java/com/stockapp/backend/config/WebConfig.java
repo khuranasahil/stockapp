@@ -14,9 +14,9 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://verify-stock-app-9xa7vg1y.devinapps.com")
+                        .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "OPTIONS")
-                        .allowCredentials(true);
+                        .allowCredentials(false);
             }
         };
     }

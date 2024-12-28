@@ -1,8 +1,9 @@
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/model/StockData.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/StockAppApplication.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/config/ActuatorConfig.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/config/WebConfig.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/health/CustomHealthIndicator.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/service/StockService.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/controller/StockController.java
-/home/ubuntu/stockapp-fullstack/backend/src/main/java/com/stockapp/backend/controller/HealthController.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/config/WebClientConfig.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/controller/HealthController.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/StockAppApplication.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/model/StockData.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/controller/StockController.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/service/StockService.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/config/WebConfig.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/health/CustomHealthIndicator.java
+/home/ubuntu/stockapp-fresh/backend/src/main/java/com/stockapp/backend/config/ActuatorConfig.java

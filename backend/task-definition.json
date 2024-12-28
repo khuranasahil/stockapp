@@ -8,7 +8,7 @@
   "containerDefinitions": [
     {
       "name": "stockapp-backend",
-      "image": "481665085747.dkr.ecr.us-east-2.amazonaws.com/stockapp-backend:1.0.0",
+      "image": "481665085747.dkr.ecr.us-east-2.amazonaws.com/stockapp-backend:latest",
       "essential": true,
       "portMappings": [
         {

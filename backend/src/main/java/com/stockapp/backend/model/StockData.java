@@ -1,5 +1,6 @@
 package com.stockapp.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;
 
@@ -27,11 +28,17 @@ class EODData {
     private double low;
     private double close;
     private double volume;
-    private double adj_high;
-    private double adj_low;
-    private double adj_close;
-    private double adj_open;
-    private double adj_volume;
-    private double split_factor;
+    @JsonProperty("adj_high")
+    private double adjHigh;
+    @JsonProperty("adj_low")
+    private double adjLow;
+    @JsonProperty("adj_close")
+    private double adjClose;
+    @JsonProperty("adj_open")
+    private double adjOpen;
+    @JsonProperty("adj_volume")
+    private double adjVolume;
+    @JsonProperty("split_factor")
+    private double splitFactor;
     private double dividend;
 }

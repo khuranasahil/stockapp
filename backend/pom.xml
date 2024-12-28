@@ -50,7 +50,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.2.1</version>
                 <configuration>
+                    <mainClass>com.stockapp.backend.StockAppApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -58,6 +60,13 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -78,7 +87,32 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-frontend</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>${project.basedir}/src/main/resources/static</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/frontend/dist</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
