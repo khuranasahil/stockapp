@@ -13,7 +13,7 @@ provider "aws" {
 
 # Use existing ECR Repository
 data "aws_ecr_repository" "stockapp" {
-  name = "stockapp-backend"
+  name = "stockapp"
 }
 
 # ECS Cluster
@@ -33,7 +33,7 @@ resource "aws_ecs_task_definition" "stockapp" {
 
   container_definitions = jsonencode([
     {
-      name  = "stockapp-backend"
+      name  = "stockapp"
       image = "${data.aws_ecr_repository.stockapp.repository_url}:latest"
       portMappings = [
         {
@@ -235,7 +235,7 @@ resource "aws_ecs_service" "stockapp" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.stockapp.arn
-    container_name   = "stockapp-backend"
+    container_name   = "stockapp"
     container_port   = 8080
   }
 }
