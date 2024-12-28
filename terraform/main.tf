@@ -210,12 +210,8 @@ resource "aws_lb_listener" "stockapp" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.stockapp.arn
   }
 }
 
@@ -240,33 +236,7 @@ resource "aws_ecs_service" "stockapp" {
   }
 }
 
-# ACM Certificate
-resource "aws_acm_certificate" "stockapp" {
-  domain_name       = "*.elb.amazonaws.com"
-  validation_method = "DNS"
 
-  tags = {
-    Name = "stockapp-cert"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# HTTPS Listener
-resource "aws_lb_listener" "stockapp_https" {
-  load_balancer_arn = aws_lb.stockapp.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.stockapp.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.stockapp.arn
-  }
-}
 
 # Output the ALB DNS name
 output "alb_dns_name" {
