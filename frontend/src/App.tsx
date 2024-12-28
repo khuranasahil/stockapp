@@ -55,11 +55,13 @@ function App() {
         'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
       };
       
+      console.log('Request headers:', headers);
       const response = await fetch(url, {
         method: 'GET',
         headers,
         mode: 'cors'
       });
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       console.log('Response status:', response.status);
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
@@ -167,13 +169,18 @@ function App() {
               <div className="w-full h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={stockData.data.map(d => ({
-                      date: new Date(d.date).toLocaleDateString(),
-                      close: d.close,
-                      open: d.open,
-                      high: d.high,
-                      low: d.low
-                    }))}
+                    data={(() => {
+                      // Group data by date, preserving symbol information
+                      const groupedData: Record<string, any> = {};
+                      stockData.data.forEach(item => {
+                        const dateKey = new Date(item.date).toLocaleDateString();
+                        if (!groupedData[dateKey]) {
+                          groupedData[dateKey] = { date: dateKey };
+                        }
+                        groupedData[dateKey][item.symbol] = item.close;
+                      });
+                      return Object.values(groupedData);
+                    })()}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
@@ -196,14 +203,21 @@ function App() {
                       }}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="close" 
-                      stroke="#8B5CF6" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Close Price"
-                    />
+                    {(() => {
+                      const uniqueSymbols = [...new Set(stockData.data.map(d => d.symbol))];
+                      const colors = ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899'];
+                      return uniqueSymbols.map((symbol, idx) => (
+                        <Line
+                          key={symbol}
+                          type="monotone"
+                          dataKey={symbol}
+                          stroke={colors[idx % colors.length]}
+                          strokeWidth={2}
+                          dot={false}
+                          name={symbol}
+                        />
+                      ));
+                    })()}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
