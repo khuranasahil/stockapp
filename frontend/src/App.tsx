@@ -5,7 +5,7 @@ import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { ScrollArea } from "./components/ui/scroll-area"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 interface StockData {
   pagination: {
@@ -195,6 +195,7 @@ function App() {
                         color: theme === 'dark' ? '#E5E7EB' : '#111827'
                       }}
                     />
+                    <Legend />
                     <Line 
                       type="monotone" 
                       dataKey="close" 
@@ -202,30 +203,6 @@ function App() {
                       strokeWidth={2}
                       dot={false}
                       name="Close Price"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="open" 
-                      stroke="#10B981" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Open Price"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="high" 
-                      stroke="#F59E0B" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="High"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="low" 
-                      stroke="#EF4444" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Low"
                     />
                   </LineChart>
                 </ResponsiveContainer>
