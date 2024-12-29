@@ -29,10 +29,13 @@ public class StockService {
     @Value("${alphavantage.api.url}")
     private String apiUrl;
 
-    @Cacheable(value = "stockDataCache", key = "#symbols")
+    @Cacheable(value = "stockDataCache", key = "#symbols", unless="#result == null")
     public StockData getEodData(String symbols) {
+        long startTime = System.currentTimeMillis();
+        System.out.println("Cache MISS for symbols: " + symbols + " - Fetching from AlphaVantage API");
         List<EODData> allData = new ArrayList<>();
         String[] symbolArray = symbols.split(",");
+        System.out.println("Request processing started at: " + startTime + "ms");
         
         for (String symbol : symbolArray) {
             String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
