@@ -148,11 +148,20 @@ function App() {
   }, [stockData, loading, error])
 
   // Cleanup effect
+  // Cleanup effect for aborting pending requests
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
+        abortControllerRef.current = null
       }
+    }
+  }, [])
+
+  // Reset error state when component unmounts
+  useEffect(() => {
+    return () => {
+      setError(null)
     }
   }, [])
 
@@ -239,10 +248,16 @@ function App() {
     }
   }
 
+  // Handle ticker input changes without triggering fetches
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
     setTickers(value)
-    setError(null) // Clear any previous errors
+    // Clear any previous errors and abort any pending requests
+    setError(null)
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
     if (DEBUG) {
       console.log('Ticker input updated:', {
         value,
