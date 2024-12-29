@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
+import ErrorBoundary from './components/ErrorBoundary'
 import { useTheme } from 'next-themes'
 import { Moon, Sun, Loader2 } from 'lucide-react'
 import { Button } from "./components/ui/button"
@@ -32,6 +33,16 @@ function App() {
   const [stockData, setStockData] = useState<StockData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
 
   // Note: SSL certificate validation is handled at the browser level for development
 
@@ -41,11 +52,21 @@ function App() {
       return
     }
 
+    // Cancel any ongoing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Create new abort controller for this request
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    // Only update loading state, keep previous data visible during fetch
     setLoading(true)
     setError(null)
-    setStockData(null)
 
     try {
+      // Keep previous stockData visible while loading new data
       const url = `http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080/api/stocks/eod?symbols=${tickers}`;
       console.log('Making request to:', url);
       
@@ -59,7 +80,8 @@ function App() {
       const response = await fetch(url, {
         method: 'GET',
         headers,
-        mode: 'cors'
+        mode: 'cors',
+        signal: abortController.signal
       });
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       console.log('Response status:', response.status);
@@ -71,10 +93,20 @@ function App() {
       }
       
       const data = await response.json()
-      setStockData(data)
-      setError(null)
+      
+      // Batch state updates to prevent unnecessary re-renders
+      const stateUpdates = () => {
+        setStockData(data)
+        setError(null)
+      }
+      stateUpdates()
     } catch (err) {
       console.error('Fetch error:', err)
+      // Don't update error state if request was aborted
+      if (err instanceof Error && err.name === 'AbortError') {
+        return
+      }
+      // Keep previous data visible on error
       setError(err instanceof Error ? err.message : 'Failed to fetch stock data. Please try again.')
     } finally {
       setLoading(false)
@@ -82,8 +114,9 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
-      <Card className="w-full max-w-6xl dark:bg-gray-800 dark:text-gray-100">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+        <Card className="w-full max-w-6xl dark:bg-gray-800 dark:text-gray-100">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
@@ -181,21 +214,26 @@ function App() {
                       const symbols = [...new Set(stockData.data.map(item => item.symbol))];
                       
                       // Create data points with numeric values for each symbol
-                      const formattedData = dates.map(date => {
+                      // Create a lookup map for faster data access
+                      const stockDataMap = useMemo(() => {
+                        const map = new Map();
+                        stockData.data.forEach(item => {
+                          const key = `${item.symbol}-${new Date(item.date).toLocaleDateString()}`;
+                          map.set(key, item);
+                        });
+                        return map;
+                      }, [stockData.data]);
+
+                      // Memoize the data transformation using the lookup map
+                      const formattedData = useMemo(() => dates.map(date => {
                         const dataPoint: any = { date };
                         symbols.forEach(symbol => {
-                          const matchingData = stockData.data.find(item => 
-                            new Date(item.date).toLocaleDateString() === date && 
-                            item.symbol === symbol
-                          );
-                          if (matchingData) {
-                            dataPoint[symbol] = matchingData.close;
-                          } else {
-                            dataPoint[symbol] = null;
-                          }
+                          const key = `${symbol}-${date}`;
+                          const matchingData = stockDataMap.get(key);
+                          dataPoint[`${symbol} Close`] = matchingData ? matchingData.close : null;
                         });
                         return dataPoint;
-                      });
+                      }), [dates, symbols, stockDataMap]);
                       console.log('Chart data:', formattedData);
                       return formattedData;
                     })()}
@@ -241,14 +279,15 @@ function App() {
                         <Line
                           key={symbol}
                           type="monotone"
-                          dataKey={symbol}
+                          dataKey={`${symbol} Close`}
                           stroke={colors[idx % colors.length]}
                           strokeWidth={2}
                           dot={false}
-                          name={`${symbol} Price`}
+                          name={`${symbol} Close Price`}
                           connectNulls={true}
                           isAnimationActive={false}
                           activeDot={{ r: 4 }}
+                          legendType="line"
                         />
                       ));
                     })()}
@@ -259,7 +298,8 @@ function App() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }
 
