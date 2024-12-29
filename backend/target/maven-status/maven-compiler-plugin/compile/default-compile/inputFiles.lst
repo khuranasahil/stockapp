@@ -1,11 +1,13 @@
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/controller/StockController.java
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/health/CustomHealthIndicator.java
+/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/WebClientConfig.java
+/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/service/StockService.java
+/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/model/StockData.java
+/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/ActuatorConfig.java
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/model/Pagination.java
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/model/EODData.java
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/WebConfig.java
-/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/WebClientConfig.java
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/StockAppApplication.java
-/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/service/StockService.java
+/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/CacheLoggingAspect.java
+/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/CacheConfig.java
 /home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/controller/HealthController.java
-/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/model/StockData.java
-/home/ubuntu/repos/stockapp/backend/src/main/java/com/stockapp/backend/config/ActuatorConfig.java
