@@ -1,4 +1,5 @@
 com/stockapp/backend/config/WebConfig.class
+com/stockapp/backend/config/CacheLoggingAspect.class
 com/stockapp/backend/controller/HealthController.class
 com/stockapp/backend/model/StockData.class
 com/stockapp/backend/controller/StockController.class
