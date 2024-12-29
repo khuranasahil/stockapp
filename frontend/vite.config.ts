@@ -23,9 +23,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify('http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com'),
-      'import.meta.env.VITE_AUTH_USERNAME': JSON.stringify('stockapp'),
-      'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify('stockapp123'),
+      'import.meta.env': JSON.stringify({
+        VITE_API_BASE_URL: env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com',
+        VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',
+        VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD || 'stockapp123',
+        MODE: mode,
+        DEV: mode === 'development',
+        PROD: mode === 'production',
+      })
     }
   }
 })
