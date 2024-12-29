@@ -238,14 +238,7 @@ function App() {
     const value = event.target.value.toUpperCase()
     setTickers(value)
     
-    // Clear any existing error when typing
-    setError(null)
-    
-    // Cancel any ongoing requests
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-    
+    // Only update the input value, no other side effects
     if (DEBUG) {
       console.log('Ticker input updated:', {
         value,
