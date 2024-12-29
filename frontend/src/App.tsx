@@ -188,22 +188,20 @@ function App() {
     setError(null)
 
     try {
-      // Use the production API URL with fallback
+      // Use absolute URL for API requests
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080';
-      const url = `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`;
-      console.log('Making request to:', url);
+      const url = new URL(`/api/stocks/eod`, apiBaseUrl).toString();
+      console.log('Making request to:', url, 'with env:', apiBaseUrl);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*',
         'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
       };
       
       console.log('Request headers:', headers);
-      const response = await fetch(url, {
+      const response = await fetch(`${url}?symbols=${encodeURIComponent(tickers)}`, {
         method: 'GET',
         headers,
-        mode: 'cors',
         signal: abortController.signal
       });
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
