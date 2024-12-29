@@ -4,9 +4,10 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const apiBaseUrl = 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
   console.log('Building with environment:', {
     mode,
-    VITE_API_BASE_URL: env.VITE_API_BASE_URL,
+    VITE_API_BASE_URL: apiBaseUrl,
   });
   
   return {
@@ -15,7 +16,13 @@ export default defineConfig(({ mode }) => {
       host: true,
       strictPort: true,
       port: 5173,
-      // Removed proxy configuration as we're using absolute URLs in production
+      proxy: {
+        '/api': {
+          target: apiBaseUrl,
+          changeOrigin: true,
+          secure: false
+        }
+      }
     },
     resolve: {
       alias: {
@@ -23,9 +30,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL || env.VITE_API_BASE_URL || ''),
-      'import.meta.env.VITE_AUTH_USERNAME': JSON.stringify(process.env.VITE_AUTH_USERNAME || env.VITE_AUTH_USERNAME || ''),
-      'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(process.env.VITE_AUTH_PASSWORD || env.VITE_AUTH_PASSWORD || ''),
+      'import.meta.env': JSON.stringify({
+        VITE_API_BASE_URL: apiBaseUrl,
+        VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',
+        VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD || 'stockapp123',
+        MODE: mode,
+        DEV: mode === 'development',
+        PROD: mode === 'production',
+      })
     }
   }
 })

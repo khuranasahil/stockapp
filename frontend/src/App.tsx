@@ -56,29 +56,17 @@ function App() {
     setError(null)
 
     try {
-      // Use absolute URL for API requests
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      if (!apiBaseUrl) {
-        console.error('API base URL not found in environment');
-        throw new Error('API base URL not configured');
-      }
-      const url = `${apiBaseUrl}/api/stocks/eod`;
-      console.log('Making request to:', url);
-      
-      const headers: Record<string, string> = {
+      // Use relative URL for API requests to work with proxy
+      const url = '/api/stocks/eod';
+      const headers = {
         'Accept': 'application/json',
-        'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
+        'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
       };
       
-      console.log('Request headers:', headers);
       const response = await fetch(`${url}?symbols=${encodeURIComponent(tickers)}`, {
         method: 'GET',
-        headers,
-
+        headers
       });
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
         const errorText = await response.text()
