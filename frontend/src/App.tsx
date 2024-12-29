@@ -265,25 +265,17 @@ function App() {
       clearTimeout(debounceTimerRef.current)
     }
 
-    // Use longer debounce delay for mobile devices
-    const debounceDelay = isiPhone16Pro ? 750 : isMobile ? 500 : 300
-
-    // Only trigger submit if there's actual input
-    if (value.trim()) {
-      debounceTimerRef.current = setTimeout(() => {
-        if (DEBUG) {
-          console.log('Debounce timer triggered:', {
-            value,
-            delay: debounceDelay,
-            timestamp: new Date().toISOString()
-          })
-        }
-        handleSubmit()
-      }, debounceDelay)
-    } else {
-      // Clear data if input is empty
+    // Only clear data if input is empty
+    if (!value.trim()) {
       setStockData(null)
       setError(null)
+    }
+    
+    if (DEBUG) {
+      console.log('Ticker input updated:', {
+        value,
+        timestamp: new Date().toISOString()
+      })
     }
   }, [DEBUG, isMobile, isiPhone16Pro, handleSubmit])
 
