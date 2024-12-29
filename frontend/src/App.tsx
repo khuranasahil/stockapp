@@ -133,7 +133,6 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   // Performance monitoring for state changes
   useEffect(() => {
@@ -153,9 +152,6 @@ function App() {
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
-      }
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
       }
     }
   }, [])
@@ -192,22 +188,24 @@ function App() {
     setError(null)
 
     try {
-      // Keep previous stockData visible while loading new data
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:80';
-      const url = `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`;
-      console.log('Making request to:', url, 'with env:', import.meta.env.VITE_API_BASE_URL);
+      // Use absolute URL for API requests
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        console.error('API base URL not found in environment');
+        throw new Error('API base URL not configured');
+      }
+      const url = `${apiBaseUrl}/api/stocks/eod`;
+      console.log('Making request to:', url);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*',
         'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
       };
       
       console.log('Request headers:', headers);
-      const response = await fetch(url, {
+      const response = await fetch(`${url}?symbols=${encodeURIComponent(tickers)}`, {
         method: 'GET',
         headers,
-        mode: 'cors',
         signal: abortController.signal
       });
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
@@ -242,50 +240,15 @@ function App() {
 
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
-    
+    setTickers(value)
+    // Do not clear error state or trigger any side effects during typing
     if (DEBUG) {
-      console.log('Ticker input change:', {
+      console.log('Ticker input updated:', {
         value,
-        timestamp: new Date().toISOString(),
-        isMobile,
-        isiPhone16Pro
+        timestamp: new Date().toISOString()
       })
     }
-
-    // Cancel any ongoing requests before updating state
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-
-    // Update visual state immediately
-    setTickers(value)
-    
-    // Clear any existing timeout
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    // Use longer debounce delay for mobile devices
-    const debounceDelay = isiPhone16Pro ? 750 : isMobile ? 500 : 300
-
-    // Only trigger submit if there's actual input
-    if (value.trim()) {
-      debounceTimerRef.current = setTimeout(() => {
-        if (DEBUG) {
-          console.log('Debounce timer triggered:', {
-            value,
-            delay: debounceDelay,
-            timestamp: new Date().toISOString()
-          })
-        }
-        handleSubmit()
-      }, debounceDelay)
-    } else {
-      // Clear data if input is empty
-      setStockData(null)
-      setError(null)
-    }
-  }, [DEBUG, isMobile, isiPhone16Pro, handleSubmit])
+  }, [DEBUG])
 
   // Transform data for chart with optimized lookups and performance monitoring
   const transformDataForChart = useCallback((data: StockData['data']) => {
