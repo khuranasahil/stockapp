@@ -170,18 +170,36 @@ function App() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={(() => {
-                      // Group data by date, preserving symbol information
-                      const groupedData: Record<string, any> = {};
-                      stockData.data.forEach(item => {
-                        const dateKey = new Date(item.date).toLocaleDateString();
-                        if (!groupedData[dateKey]) {
-                          groupedData[dateKey] = { date: dateKey };
-                        }
-                        groupedData[dateKey][item.symbol] = item.close;
+                      if (!stockData?.data) return [];
+                      
+                      // Get unique dates and sort them
+                      const dates = [...new Set(stockData.data.map(item => 
+                        new Date(item.date).toLocaleDateString()
+                      ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+                      
+                      // Get unique symbols
+                      const symbols = [...new Set(stockData.data.map(item => item.symbol))];
+                      
+                      // Create data points with numeric values for each symbol
+                      const formattedData = dates.map(date => {
+                        const dataPoint: any = { date };
+                        symbols.forEach(symbol => {
+                          const matchingData = stockData.data.find(item => 
+                            new Date(item.date).toLocaleDateString() === date && 
+                            item.symbol === symbol
+                          );
+                          if (matchingData) {
+                            dataPoint[symbol] = matchingData.close;
+                          } else {
+                            dataPoint[symbol] = null;
+                          }
+                        });
+                        return dataPoint;
                       });
-                      return Object.values(groupedData);
+                      console.log('Chart data:', formattedData);
+                      return formattedData;
                     })()}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
                     <XAxis 
@@ -196,14 +214,27 @@ function App() {
                       contentStyle={{
                         backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
                         border: '1px solid #374151',
-                        borderRadius: '0.375rem'
+                        borderRadius: '0.375rem',
+                        padding: '10px'
                       }}
                       labelStyle={{
+                        color: theme === 'dark' ? '#E5E7EB' : '#111827',
+                        marginBottom: '5px'
+                      }}
+                      formatter={(value, name) => [`$${Number(value).toFixed(2)}`, `${name}`]}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Legend 
+                      wrapperStyle={{ 
+                        paddingTop: '20px',
                         color: theme === 'dark' ? '#E5E7EB' : '#111827'
                       }}
+                      verticalAlign="bottom"
+                      height={36}
+                      iconType="circle"
                     />
-                    <Legend />
                     {(() => {
+                      if (!stockData?.data) return null;
                       const uniqueSymbols = [...new Set(stockData.data.map(d => d.symbol))];
                       const colors = ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899'];
                       return uniqueSymbols.map((symbol, idx) => (
@@ -214,7 +245,10 @@ function App() {
                           stroke={colors[idx % colors.length]}
                           strokeWidth={2}
                           dot={false}
-                          name={symbol}
+                          name={`${symbol} Price`}
+                          connectNulls={true}
+                          isAnimationActive={false}
+                          activeDot={{ r: 4 }}
                         />
                       ));
                     })()}
