@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 
 interface ChartDataPoint {
@@ -39,6 +39,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Cleanup effect
   useEffect(() => {
@@ -46,8 +47,25 @@ function App() {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
     }
   }, [])
+
+  const handleTickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    // Update visual state immediately
+    setTickers(value)
+    
+    // Debounce the actual data fetch
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      handleSubmit()
+    }, 300)
+  }
 
   // Note: SSL certificate validation is handled at the browser level for development
 
@@ -118,31 +136,40 @@ function App() {
     }
   }
 
-  // Memoize chart data transformation
-  const chartData = useMemo(() => {
-    if (!stockData?.data) return [];
-    
-    // Get unique dates and sort them
-    const dates = [...new Set(stockData.data.map(item => 
-      new Date(item.date).toLocaleDateString()
-    ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-    
-    // Get unique symbols
-    const symbols = [...new Set(stockData.data.map(item => item.symbol))];
-    
-    // Create data points for each date
-    return dates.map(date => {
+  // Transform data for chart with optimized lookups
+  const transformDataForChart = useCallback((data: StockData['data']) => {
+    // Create a Map for O(1) lookups: key = `${symbol}-${date}`, value = close price
+    const dataMap = new Map(
+      data.map(item => {
+        const dateStr = new Date(item.date).toLocaleDateString();
+        return [`${item.symbol}-${dateStr}`, item.close];
+      })
+    );
+
+    // Get and sort unique dates once
+    const uniqueDates = [...new Set(
+      data.map(item => new Date(item.date))
+    )].sort((a, b) => a.getTime() - b.getTime())
+      .map(date => date.toLocaleDateString());
+
+    // Get unique symbols once
+    const symbols = [...new Set(data.map(item => item.symbol))];
+
+    // Create data points efficiently using the Map
+    return uniqueDates.map(date => {
       const dataPoint: ChartDataPoint = { date };
       symbols.forEach(symbol => {
-        const matchingData = stockData.data.find(item => 
-          new Date(item.date).toLocaleDateString() === date && 
-          item.symbol === symbol
-        );
-        dataPoint[`${symbol} Close`] = matchingData ? matchingData.close : null;
+        dataPoint[`${symbol} Close`] = dataMap.get(`${symbol}-${date}`) ?? null;
       });
       return dataPoint;
     });
-  }, [stockData?.data]);
+  }, []);
+
+  // Memoize chart data
+  const chartData = useMemo(() => {
+    if (!stockData?.data) return [];
+    return transformDataForChart(stockData.data);
+  }, [stockData?.data, transformDataForChart]);
 
   // Memoize unique symbols and colors for the chart
   const { uniqueSymbols, colors } = useMemo(() => ({
@@ -177,7 +204,7 @@ function App() {
             <Input
               placeholder="Enter stock tickers..."
               value={tickers}
-              onChange={(e) => setTickers(e.target.value)}
+              onChange={handleTickerChange}
               className="flex-1 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
             />
             <Button 
