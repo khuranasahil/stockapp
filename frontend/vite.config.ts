@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => {
         VITE_API_BASE_URL: apiBaseUrl,
         VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',
         VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD || 'stockapp123',
-        VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY,
+        VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY || 'CLTNUH1J362422LR',
         MODE: mode,
         DEV: mode === 'development',
         PROD: mode === 'production'
