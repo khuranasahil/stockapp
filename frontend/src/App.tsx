@@ -189,9 +189,13 @@ function App() {
 
     try {
       // Use absolute URL for API requests
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        console.error('API base URL not found in environment');
+        throw new Error('API base URL not configured');
+      }
       const url = `${apiBaseUrl}/api/stocks/eod`;
-      console.log('Making request to:', url, 'with env:', apiBaseUrl);
+      console.log('Making request to:', url);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
