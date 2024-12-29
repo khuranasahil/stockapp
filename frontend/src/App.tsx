@@ -189,18 +189,20 @@ function App() {
 
     try {
       // Use absolute URL for API requests
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      if (!apiBaseUrl) {
-        throw new Error('API base URL is not configured');
-      }
-      console.log('Making request to:', apiBaseUrl);
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
+      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${encodeURIComponent(tickers)}`, 'with env:', apiBaseUrl);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
         'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
       };
       
       const url = `${apiBaseUrl}/api/stocks/eod`;
+      if (DEBUG) {
+        console.log('Request URL:', url);
+        console.log('Request headers:', headers);
+      }
       console.log('Request headers:', headers);
       const response = await fetch(`${url}?symbols=${encodeURIComponent(tickers)}`, {
         method: 'GET',
@@ -240,6 +242,7 @@ function App() {
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
     setTickers(value)
+    setError(null) // Clear any previous errors
     if (DEBUG) {
       console.log('Ticker input updated:', {
         value,
