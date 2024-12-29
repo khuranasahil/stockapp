@@ -240,9 +240,12 @@ function App() {
     const value = event.target.value.toUpperCase()
     setTickers(value)
     
-    // Clear error only if it's the "Load Failed" message
-    if (error === 'Load Failed') {
-      setError(null)
+    // Clear any existing error when typing
+    setError(null)
+    
+    // Cancel any ongoing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
     }
     
     if (DEBUG) {
@@ -251,7 +254,7 @@ function App() {
         timestamp: new Date().toISOString()
       })
     }
-  }, [DEBUG, error])
+  }, [DEBUG])
 
   // Transform data for chart with optimized lookups and performance monitoring
   const transformDataForChart = useCallback((data: StockData['data']) => {

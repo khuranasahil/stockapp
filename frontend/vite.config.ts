@@ -15,6 +15,13 @@ export default defineConfig(({ mode }) => {
       host: true,
       strictPort: true,
       port: 5173,
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080',
+          changeOrigin: true,
+          secure: false
+        }
+      }
     },
     resolve: {
       alias: {
