@@ -1,5 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import ErrorBoundary from './components/ErrorBoundary'
+import ErrorBoundary from './components/ui/ErrorBoundary'
+
+interface ChartDataPoint {
+  date: string;
+  [key: string]: string | number | null;
+}
 import { useTheme } from 'next-themes'
 import { Moon, Sun, Loader2 } from 'lucide-react'
 import { Button } from "./components/ui/button"
@@ -113,6 +118,38 @@ function App() {
     }
   }
 
+  // Memoize chart data transformation
+  const chartData = useMemo(() => {
+    if (!stockData?.data) return [];
+    
+    // Get unique dates and sort them
+    const dates = [...new Set(stockData.data.map(item => 
+      new Date(item.date).toLocaleDateString()
+    ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    
+    // Get unique symbols
+    const symbols = [...new Set(stockData.data.map(item => item.symbol))];
+    
+    // Create data points for each date
+    return dates.map(date => {
+      const dataPoint: ChartDataPoint = { date };
+      symbols.forEach(symbol => {
+        const matchingData = stockData.data.find(item => 
+          new Date(item.date).toLocaleDateString() === date && 
+          item.symbol === symbol
+        );
+        dataPoint[`${symbol} Close`] = matchingData ? matchingData.close : null;
+      });
+      return dataPoint;
+    });
+  }, [stockData?.data]);
+
+  // Memoize unique symbols and colors for the chart
+  const { uniqueSymbols, colors } = useMemo(() => ({
+    uniqueSymbols: stockData?.data ? [...new Set(stockData.data.map(d => d.symbol))] : [],
+    colors: ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899']
+  }), [stockData?.data]);
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
@@ -202,41 +239,7 @@ function App() {
               <div className="w-full h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={(() => {
-                      if (!stockData?.data) return [];
-                      
-                      // Get unique dates and sort them
-                      const dates = [...new Set(stockData.data.map(item => 
-                        new Date(item.date).toLocaleDateString()
-                      ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-                      
-                      // Get unique symbols
-                      const symbols = [...new Set(stockData.data.map(item => item.symbol))];
-                      
-                      // Create data points with numeric values for each symbol
-                      // Create a lookup map for faster data access
-                      const stockDataMap = useMemo(() => {
-                        const map = new Map();
-                        stockData.data.forEach(item => {
-                          const key = `${item.symbol}-${new Date(item.date).toLocaleDateString()}`;
-                          map.set(key, item);
-                        });
-                        return map;
-                      }, [stockData.data]);
-
-                      // Memoize the data transformation using the lookup map
-                      const formattedData = useMemo(() => dates.map(date => {
-                        const dataPoint: any = { date };
-                        symbols.forEach(symbol => {
-                          const key = `${symbol}-${date}`;
-                          const matchingData = stockDataMap.get(key);
-                          dataPoint[`${symbol} Close`] = matchingData ? matchingData.close : null;
-                        });
-                        return dataPoint;
-                      }), [dates, symbols, stockDataMap]);
-                      console.log('Chart data:', formattedData);
-                      return formattedData;
-                    })()}
+                    data={chartData}
                     margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
@@ -271,11 +274,7 @@ function App() {
                       height={36}
                       iconType="circle"
                     />
-                    {(() => {
-                      if (!stockData?.data) return null;
-                      const uniqueSymbols = [...new Set(stockData.data.map(d => d.symbol))];
-                      const colors = ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899'];
-                      return uniqueSymbols.map((symbol, idx) => (
+                    {uniqueSymbols.map((symbol, idx) => (
                         <Line
                           key={symbol}
                           type="monotone"
@@ -289,8 +288,7 @@ function App() {
                           activeDot={{ r: 4 }}
                           legendType="line"
                         />
-                      ));
-                    })()}
+                    ))}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
