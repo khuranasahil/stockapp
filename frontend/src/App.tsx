@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 
 interface ChartDataPoint {
@@ -56,9 +56,12 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        throw new Error('VITE_API_BASE_URL environment variable is required');
+      }
       const url = `${apiBaseUrl}/api/stocks/eod`;
-      console.log('Making request to:', url, 'with env:', apiBaseUrl);
+      console.log('Making request to:', url);
       const headers = {
         'Accept': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -95,6 +98,15 @@ function App() {
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
     setTickers(value)
+    setError(null) // Clear any previous errors when user types
+  }, [])
+
+  // Remove any auto-fetch behavior
+  useEffect(() => {
+    // Cleanup any previous error state when component mounts
+    return () => {
+      setError(null)
+    }
   }, [])
 
   // Transform data for chart with optimized lookups and performance monitoring
