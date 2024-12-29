@@ -4,8 +4,7 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:8080';
-
+  
   return {
     plugins: [react()],
     server: {
@@ -19,7 +18,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL),
+      'import.meta.env.VITE_AUTH_USERNAME': JSON.stringify(env.VITE_AUTH_USERNAME),
+      'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(env.VITE_AUTH_PASSWORD),
     }
   }
 })
