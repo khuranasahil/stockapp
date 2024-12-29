@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
+  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:8080';
   console.log('Building with environment:', {
     mode,
     VITE_API_BASE_URL: apiBaseUrl,
@@ -16,13 +16,13 @@ export default defineConfig(({ mode }) => {
       host: true,
       strictPort: true,
       port: 5173,
-      proxy: {
+      proxy: mode === 'development' ? {
         '/api': {
           target: apiBaseUrl,
           changeOrigin: true,
           secure: false
         }
-      }
+      } : {}
     },
     resolve: {
       alias: {
