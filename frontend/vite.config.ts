@@ -4,15 +4,8 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
-  console.log('Using API base URL:', apiBaseUrl);
-  console.log('Building with environment:', {
-    mode,
-    VITE_API_BASE_URL: apiBaseUrl,
-    VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME,
-    VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD,
-    VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY
-  });
+  const apiBaseUrl = 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
+  console.log('Using fixed API base URL:', apiBaseUrl);
   
   return {
     plugins: [react()],
