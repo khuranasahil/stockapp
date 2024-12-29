@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false
         }
-      } : {}
+      } : undefined,
     },
     resolve: {
       alias: {
