@@ -56,10 +56,12 @@ function App() {
     setError(null)
 
     try {
-      // Use relative URL for API requests to work with proxy
-      const url = '/api/stocks/eod';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const url = `${apiBaseUrl}/api/stocks/eod`;
+      console.log('Making request to:', url, 'with env:', apiBaseUrl);
       const headers = {
         'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
         'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
       };
       
