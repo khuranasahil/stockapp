@@ -19,13 +19,9 @@ export default defineConfig(({ mode }) => {
       host: true,
       strictPort: true,
       port: 5173,
-      proxy: mode === 'development' ? {
-        '/api': {
-          target: apiBaseUrl,
-          changeOrigin: true,
-          secure: false
-        }
-      } : undefined,
+    },
+    preview: {
+      port: 5173,
     },
     resolve: {
       alias: {
@@ -33,14 +29,12 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env': JSON.stringify({
-        VITE_API_BASE_URL: apiBaseUrl,
-        VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',
-        VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD || 'stockapp123',
-        MODE: mode,
-        DEV: mode === 'development',
-        PROD: mode === 'production',
-      })
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),
+      'import.meta.env.VITE_AUTH_USERNAME': JSON.stringify(env.VITE_AUTH_USERNAME || 'stockapp'),
+      'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(env.VITE_AUTH_PASSWORD || 'stockapp123'),
+      'import.meta.env.MODE': JSON.stringify(mode),
+      'import.meta.env.DEV': mode === 'development',
+      'import.meta.env.PROD': mode === 'production'
     }
   }
 })

@@ -56,15 +56,11 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      if (!apiBaseUrl) {
-        throw new Error('VITE_API_BASE_URL environment variable is required');
-      }
-      const url = `${apiBaseUrl}/api/stocks/eod`;
-      console.log('Making request to:', url);
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+      const url = new URL('/api/stocks/eod', apiBaseUrl).toString();
+      console.log('Making request to:', url, 'with env:', apiBaseUrl);
       const headers = {
         'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*',
         'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
       };
       
