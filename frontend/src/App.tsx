@@ -189,8 +189,11 @@ function App() {
 
     try {
       // Use absolute URL for API requests
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
-      console.log('Making request to:', apiBaseUrl, 'with env:', import.meta.env);
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        throw new Error('API base URL is not configured');
+      }
+      console.log('Making request to:', apiBaseUrl);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
@@ -237,7 +240,6 @@ function App() {
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
     setTickers(value)
-    setError(null) // Clear any previous error messages during typing
     if (DEBUG) {
       console.log('Ticker input updated:', {
         value,
