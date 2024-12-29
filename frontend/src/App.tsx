@@ -55,11 +55,15 @@ function App() {
 
   const handleTickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
+    // Update visual state immediately
+    setTickers(value)
+    
+    // Debounce the actual data fetch
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
     }
     debounceTimerRef.current = setTimeout(() => {
-      setTickers(value)
+      handleSubmit()
     }, 300)
   }
 
