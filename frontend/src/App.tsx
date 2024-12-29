@@ -193,9 +193,12 @@ function App() {
 
     try {
       // Keep previous stockData visible while loading new data
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:80';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        throw new Error('API base URL not configured. Please check environment configuration.');
+      }
       const url = `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`;
-      console.log('Making request to:', url, 'with env:', import.meta.env.VITE_API_BASE_URL);
+      console.log('Making request to:', url);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
