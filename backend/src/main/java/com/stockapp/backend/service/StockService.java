@@ -70,12 +70,15 @@ public class StockService {
                     Iterator<Map.Entry<String, JsonNode>> fields = timeSeries.fields();
                     while (fields.hasNext()) {
                         Map.Entry<String, JsonNode> entry = fields.next();
-                        String date = entry.getKey();
+                        String rawDate = entry.getKey();
                         JsonNode data = entry.getValue();
+                        
+                        // Convert date to ISO-8601 format
+                        String isoDate = java.time.LocalDate.parse(rawDate).toString() + "T00:00:00Z";
                         
                         EODData eodData = new EODData();
                         eodData.setSymbol(symbol);
-                        eodData.setDate(date);
+                        eodData.setDate(isoDate);
                         eodData.setOpen(Double.parseDouble(data.get("1. open").asText()));
                         eodData.setHigh(Double.parseDouble(data.get("2. high").asText()));
                         eodData.setLow(Double.parseDouble(data.get("3. low").asText()));
