@@ -8,13 +8,6 @@ export default defineConfig({
     host: true,
     strictPort: true,
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://3.136.36.129:8080',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
   },
   resolve: {
     alias: {
