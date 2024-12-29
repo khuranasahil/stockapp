@@ -30,6 +30,13 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
+      'process.env': {
+        VITE_API_BASE_URL: JSON.stringify(apiBaseUrl),
+        VITE_AUTH_USERNAME: JSON.stringify(env.VITE_AUTH_USERNAME || 'stockapp'),
+        VITE_AUTH_PASSWORD: JSON.stringify(env.VITE_AUTH_PASSWORD || 'stockapp123'),
+        VITE_ALPHAVANTAGE_API_KEY: JSON.stringify(env.VITE_ALPHAVANTAGE_API_KEY || 'CLTNUH1J362422LR'),
+        NODE_ENV: JSON.stringify(mode)
+      },
       'import.meta.env': JSON.stringify({
         VITE_API_BASE_URL: apiBaseUrl,
         VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',

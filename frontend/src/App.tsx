@@ -53,14 +53,18 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.amazonaws.com';
-      console.log('API Base URL:', apiBaseUrl); // Debug log
+      const apiBaseUrl = process.env.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.amazonaws.com';
+      console.log('Environment:', {
+        processEnv: process.env.VITE_API_BASE_URL,
+        importMetaEnv: import.meta.env.VITE_API_BASE_URL,
+        finalApiBaseUrl: apiBaseUrl
+      }); // Debug log
       if (!apiBaseUrl) {
         throw new Error('VITE_API_BASE_URL environment variable is required');
       }
       
       const url = `${apiBaseUrl}/api/stocks/eod?symbols=${encodeURIComponent(tickers)}`;
-      console.log('Making request to:', url, 'with env:', apiBaseUrl); // Debug log
+      console.log('Making request to:', url); // Debug log
       const response = await fetch(url, {
         method: 'GET',
         headers: {
