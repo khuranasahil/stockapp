@@ -193,8 +193,9 @@ function App() {
 
     try {
       // Keep previous stockData visible while loading new data
-      const url = `http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080/api/stocks/eod?symbols=${tickers}`;
-      console.log('Making request to:', url);
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:80';
+      const url = `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`;
+      console.log('Making request to:', url, 'with env:', import.meta.env.VITE_API_BASE_URL);
       
       const headers: Record<string, string> = {
         'Accept': 'application/json',
@@ -311,7 +312,9 @@ function App() {
     const mapStartTime = performance.now();
     const dataMap = new Map(
       data.map(item => {
-        const dateStr = new Date(item.date).toLocaleDateString();
+        // Date is already in ISO format, just parse it once
+        const date = new Date(item.date);
+        const dateStr = date.toLocaleDateString();
         return [`${item.symbol}-${dateStr}`, item.close];
       })
     );
@@ -320,7 +323,7 @@ function App() {
     // Get and sort unique dates with timing
     const datesStartTime = performance.now();
     const uniqueDates = [...new Set(
-      data.map(item => new Date(item.date))
+      data.map(item => new Date(item.date)) // Date is already in ISO format
     )].sort((a, b) => a.getTime() - b.getTime())
       .map(date => date.toLocaleDateString());
     const datesEndTime = performance.now();
