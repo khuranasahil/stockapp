@@ -14,9 +14,15 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET", "POST", "OPTIONS")
-                        .allowCredentials(false);
+                        .allowedOrigins(
+                            "http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com",
+                            "http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080",
+                            "http://localhost:5173"
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .exposedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

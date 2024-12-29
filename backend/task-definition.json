@@ -23,37 +23,29 @@
           "value": "prod"
         },
         {
-          "name": "MARKETSTACK_API_KEY",
-          "value": "83c8eb73c602dc78f07f9235123411b4"
+          "name": "ALPHAVANTAGE_API_KEY",
+          "value": "T8OX83MB8MKO0WQQ"
         },
         {
           "name": "LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB",
           "value": "DEBUG"
-        },
-        {
-          "name": "LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_BOOT_ACTUATE",
-          "value": "DEBUG"
-        },
-        {
-          "name": "SERVER_PORT",
-          "value": "8080"
         }
       ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/stockapp-backend",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs",
-          "awslogs-create-group": "true"
-        }
-      },
       "healthCheck": {
-        "command": ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"],
+        "command": ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1"],
         "interval": 30,
         "timeout": 5,
         "retries": 3,
         "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/stockapp-container",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
       }
     }
   ]

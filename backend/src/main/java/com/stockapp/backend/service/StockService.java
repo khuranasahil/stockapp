@@ -2,6 +2,7 @@ package com.stockapp.backend.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cache.annotation.Cacheable;
 import com.stockapp.backend.model.StockData;
 import com.stockapp.backend.model.EODData;
 import com.stockapp.backend.model.Pagination;
@@ -28,6 +29,7 @@ public class StockService {
     @Value("${alphavantage.api.url}")
     private String apiUrl;
 
+    @Cacheable(value = "stockDataCache", key = "#symbols")
     public StockData getEodData(String symbols) {
         List<EODData> allData = new ArrayList<>();
         String[] symbolArray = symbols.split(",");

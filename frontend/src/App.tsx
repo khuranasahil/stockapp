@@ -46,7 +46,7 @@ function App() {
     setStockData(null)
 
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/stocks/eod?symbols=${tickers}`;
+      const url = `http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080/api/stocks/eod?symbols=${tickers}`;
       console.log('Making request to:', url);
       
       const headers: Record<string, string> = {
