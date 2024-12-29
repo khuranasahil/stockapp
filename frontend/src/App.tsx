@@ -323,9 +323,15 @@ function App() {
 
   // Transform data for chart with optimized lookups and performance monitoring
   const transformDataForChart = useCallback((data: StockData['data']) => {
+    // Early return for invalid data
+    if (!data?.length) {
+      console.debug('No data to transform');
+      return [];
+    }
+
     const startTime = performance.now();
     let memoryBefore: any;
-    
+
     if (DEBUG) {
       try {
         memoryBefore = (window.performance as any).memory;
@@ -342,55 +348,68 @@ function App() {
       }
     }
 
-    // Create Map for O(1) lookups with timing
-    const mapStartTime = performance.now();
-    const dataMap = new Map(
-      data.map(item => {
-        const dateStr = new Date(item.date).toLocaleDateString();
-        return [`${item.symbol}-${dateStr}`, item.close];
-      })
-    );
-    const mapEndTime = performance.now();
+    try {
+      // Process data in smaller chunks to reduce memory pressure
+      const CHUNK_SIZE = isMobile ? 100 : 500;
+      let processedDates = new Set<string>();
+      let processedSymbols = new Set<string>();
+      let dataMap = new Map<string, number>();
 
-    // Get and sort unique dates with timing
-    const datesStartTime = performance.now();
-    const uniqueDates = [...new Set(
-      data.map(item => new Date(item.date))
-    )].sort((a, b) => a.getTime() - b.getTime())
-      .map(date => date.toLocaleDateString());
-    const datesEndTime = performance.now();
+      // Process data in chunks
+      for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+        const chunk = data.slice(i, Math.min(i + CHUNK_SIZE, data.length));
+        
+        chunk.forEach(item => {
+          try {
+            const dateStr = new Date(item.date).toLocaleDateString();
+            processedDates.add(dateStr);
+            processedSymbols.add(item.symbol);
+            dataMap.set(`${item.symbol}-${dateStr}`, item.close);
+          } catch (err) {
+            console.warn('Error processing data item:', { item, error: err });
+          }
+        });
 
-    // Get unique symbols with timing
-    const symbolsStartTime = performance.now();
-    const symbols = [...new Set(data.map(item => item.symbol))];
-    const symbolsEndTime = performance.now();
+        if (DEBUG) {
+          console.log(`Processed chunk ${Math.floor(i / CHUNK_SIZE) + 1}/${Math.ceil(data.length / CHUNK_SIZE)}`, {
+            chunkSize: chunk.length,
+            totalProcessed: i + chunk.length,
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
 
-    // Create data points with timing
-    const transformStartTime = performance.now();
-    const result = uniqueDates.map(date => {
-      const dataPoint: ChartDataPoint = { date };
-      symbols.forEach(symbol => {
-        dataPoint[`${symbol} Close`] = dataMap.get(`${symbol}-${date}`) ?? null;
+      // Convert sets to sorted arrays
+      const uniqueDates = Array.from(processedDates).sort((a, b) => 
+        new Date(a).getTime() - new Date(b).getTime()
+      );
+      const symbols = Array.from(processedSymbols);
+
+      // Create chart data points
+      const transformStartTime = performance.now();
+      const result = uniqueDates.map(date => {
+        const dataPoint: ChartDataPoint = { date };
+        symbols.forEach(symbol => {
+          const value = dataMap.get(`${symbol}-${date}`);
+          if (value !== undefined) {
+            dataPoint[`${symbol} Close`] = value;
+          }
+        });
+        return dataPoint;
       });
-      return dataPoint;
-    });
-    const transformEndTime = performance.now();
 
-    if (DEBUG) {
-      try {
+      if (DEBUG) {
         const memoryAfter = (window.performance as any).memory;
         console.log('Data transformation complete:', {
           timing: {
-            total: transformEndTime - startTime,
-            mapCreation: mapEndTime - mapStartTime,
-            dateProcessing: datesEndTime - datesStartTime,
-            symbolProcessing: symbolsEndTime - symbolsStartTime,
-            dataTransform: transformEndTime - transformStartTime
+            total: performance.now() - startTime,
+            transform: performance.now() - transformStartTime
           },
           metrics: {
             uniqueDatesCount: uniqueDates.length,
             symbolsCount: symbols.length,
-            dataPointsCount: result.length
+            dataPointsCount: result.length,
+            chunkSize: CHUNK_SIZE
           },
           memory: memoryAfter ? {
             usedJSHeapSize: Math.round(memoryAfter.usedJSHeapSize / (1024 * 1024)),
@@ -399,13 +418,14 @@ function App() {
           } : 'Not available',
           timestamp: new Date().toISOString()
         });
-      } catch (err) {
-        console.debug('Memory metrics not available:', err);
       }
-    }
 
-    return result;
-  }, [DEBUG]);
+      return result;
+    } catch (err) {
+      console.error('Error in data transformation:', err);
+      return [];
+    }
+  }, [DEBUG, isMobile]);
 
   // Memoize chart data with performance monitoring
   const chartData = useMemo(() => {
