@@ -13,7 +13,7 @@ provider "aws" {
 
 # Use existing ECR Repository
 data "aws_ecr_repository" "stockapp" {
-  name = "stockapp-backend"
+  name = "stockapp"
 }
 
 # ECS Cluster
@@ -26,14 +26,14 @@ resource "aws_ecs_task_definition" "stockapp" {
   family                   = "stockapp"
   requires_compatibilities = ["FARGATE"]
   network_mode            = "awsvpc"
-  cpu                     = 256
-  memory                  = 512
+  cpu                     = 512
+  memory                  = 1024
   execution_role_arn      = aws_iam_role.ecs_execution_role.arn
   task_role_arn          = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
-      name  = "stockapp-backend"
+      name  = "stockapp"
       image = "${data.aws_ecr_repository.stockapp.repository_url}:latest"
       portMappings = [
         {
@@ -99,69 +99,38 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
-# VPC and Security Groups
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  
-  tags = {
-    Name = "stockapp-vpc"
-  }
+# Use existing VPC and Subnets
+data "aws_vpc" "main" {
+  id = "vpc-0eb73178b493c167f"
 }
 
-# Internet Gateway
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "stockapp-igw"
-  }
-}
-
-# Route Table
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
-
-  tags = {
-    Name = "stockapp-public-rt"
-  }
-}
-
-# Route Table Association
-resource "aws_route_table_association" "public" {
-  count          = 2
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_subnet" "public" {
-  count             = 2
-  vpc_id           = aws_vpc.main.id
-  cidr_block       = "10.0.${count.index + 1}.0/24"
-  availability_zone = "us-east-2${count.index == 0 ? "a" : "b"}"
-  
-  map_public_ip_on_launch = true
-  
-  tags = {
-    Name = "stockapp-public-${count.index + 1}"
-  }
+data "aws_subnet" "public" {
+  count = 2
+  id    = count.index == 0 ? "subnet-08f66d7f6b459874e" : "subnet-00528677e6dd9610d"
 }
 
 resource "aws_security_group" "ecs_tasks" {
   name        = "stockapp-ecs-tasks"
   description = "Allow inbound traffic for ECS tasks"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port   = 8080
     to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -180,27 +149,60 @@ resource "aws_lb" "stockapp" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_tasks.id]
-  subnets           = aws_subnet.public[*].id
+  subnets           = data.aws_subnet.public[*].id
 }
 
 resource "aws_lb_target_group" "stockapp" {
   name        = "stockapp-tg"
   port        = 8080
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
   target_type = "ip"
 
   health_check {
     path                = "/actuator/health"
     healthy_threshold   = 2
     unhealthy_threshold = 10
+    interval            = 120
+    timeout             = 60
+    matcher             = "200"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  deregistration_delay = 300
+}
+
+resource "aws_acm_certificate" "stockapp" {
+  domain_name       = aws_lb.stockapp.dns_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
-resource "aws_lb_listener" "stockapp" {
+resource "aws_lb_listener" "stockapp_http" {
   load_balancer_arn = aws_lb.stockapp.arn
   port              = "80"
   protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "stockapp_https" {
+  load_balancer_arn = aws_lb.stockapp.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.stockapp.arn
 
   default_action {
     type             = "forward"
@@ -217,17 +219,21 @@ resource "aws_ecs_service" "stockapp" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = aws_subnet.public[*].id
+    subnets          = data.aws_subnet.public[*].id
     security_groups  = [aws_security_group.ecs_tasks.id]
     assign_public_ip = true
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.stockapp.arn
-    container_name   = "stockapp-backend"
+    container_name   = "stockapp"
     container_port   = 8080
   }
+  
+  health_check_grace_period_seconds = 600
 }
+
+
 
 # Output the ALB DNS name
 output "alb_dns_name" {

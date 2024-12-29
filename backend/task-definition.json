@@ -1,5 +1,5 @@
 {
-  "family": "stockapp-backend",
+  "family": "stockapp",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
@@ -7,8 +7,8 @@
   "executionRoleArn": "arn:aws:iam::481665085747:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "stockapp-backend",
-      "image": "481665085747.dkr.ecr.us-east-2.amazonaws.com/stockapp-backend:latest",
+      "name": "stockapp",
+      "image": "481665085747.dkr.ecr.us-east-2.amazonaws.com/stockapp:latest",
       "essential": true,
       "portMappings": [
         {
@@ -23,33 +23,29 @@
           "value": "prod"
         },
         {
+          "name": "ALPHAVANTAGE_API_KEY",
+          "value": "T8OX83MB8MKO0WQQ"
+        },
+        {
           "name": "LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB",
           "value": "DEBUG"
-        },
-        {
-          "name": "LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_BOOT_ACTUATE",
-          "value": "DEBUG"
-        },
-        {
-          "name": "SERVER_PORT",
-          "value": "8080"
         }
       ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/stockapp-backend",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs",
-          "awslogs-create-group": "true"
-        }
-      },
       "healthCheck": {
-        "command": ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"],
+        "command": ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1"],
         "interval": 30,
         "timeout": 5,
         "retries": 3,
         "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/stockapp-container",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
       }
     }
   ]

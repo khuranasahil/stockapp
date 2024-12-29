@@ -5,7 +5,7 @@ import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { ScrollArea } from "./components/ui/scroll-area"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 interface StockData {
   pagination: {
@@ -46,7 +46,7 @@ function App() {
     setStockData(null)
 
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/stocks/eod?symbols=${tickers}`;
+      const url = `http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080/api/stocks/eod?symbols=${tickers}`;
       console.log('Making request to:', url);
       
       const headers: Record<string, string> = {
@@ -55,11 +55,13 @@ function App() {
         'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
       };
       
+      console.log('Request headers:', headers);
       const response = await fetch(url, {
         method: 'GET',
         headers,
         mode: 'cors'
       });
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       console.log('Response status:', response.status);
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
@@ -167,14 +169,37 @@ function App() {
               <div className="w-full h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={stockData.data.map(d => ({
-                      date: new Date(d.date).toLocaleDateString(),
-                      close: d.close,
-                      open: d.open,
-                      high: d.high,
-                      low: d.low
-                    }))}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    data={(() => {
+                      if (!stockData?.data) return [];
+                      
+                      // Get unique dates and sort them
+                      const dates = [...new Set(stockData.data.map(item => 
+                        new Date(item.date).toLocaleDateString()
+                      ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+                      
+                      // Get unique symbols
+                      const symbols = [...new Set(stockData.data.map(item => item.symbol))];
+                      
+                      // Create data points with numeric values for each symbol
+                      const formattedData = dates.map(date => {
+                        const dataPoint: any = { date };
+                        symbols.forEach(symbol => {
+                          const matchingData = stockData.data.find(item => 
+                            new Date(item.date).toLocaleDateString() === date && 
+                            item.symbol === symbol
+                          );
+                          if (matchingData) {
+                            dataPoint[symbol] = matchingData.close;
+                          } else {
+                            dataPoint[symbol] = null;
+                          }
+                        });
+                        return dataPoint;
+                      });
+                      console.log('Chart data:', formattedData);
+                      return formattedData;
+                    })()}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
                     <XAxis 
@@ -189,44 +214,44 @@ function App() {
                       contentStyle={{
                         backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
                         border: '1px solid #374151',
-                        borderRadius: '0.375rem'
+                        borderRadius: '0.375rem',
+                        padding: '10px'
                       }}
                       labelStyle={{
+                        color: theme === 'dark' ? '#E5E7EB' : '#111827',
+                        marginBottom: '5px'
+                      }}
+                      formatter={(value, name) => [`$${Number(value).toFixed(2)}`, `${name}`]}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Legend 
+                      wrapperStyle={{ 
+                        paddingTop: '20px',
                         color: theme === 'dark' ? '#E5E7EB' : '#111827'
                       }}
+                      verticalAlign="bottom"
+                      height={36}
+                      iconType="circle"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="close" 
-                      stroke="#8B5CF6" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Close Price"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="open" 
-                      stroke="#10B981" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Open Price"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="high" 
-                      stroke="#F59E0B" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="High"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="low" 
-                      stroke="#EF4444" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Low"
-                    />
+                    {(() => {
+                      if (!stockData?.data) return null;
+                      const uniqueSymbols = [...new Set(stockData.data.map(d => d.symbol))];
+                      const colors = ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899'];
+                      return uniqueSymbols.map((symbol, idx) => (
+                        <Line
+                          key={symbol}
+                          type="monotone"
+                          dataKey={symbol}
+                          stroke={colors[idx % colors.length]}
+                          strokeWidth={2}
+                          dot={false}
+                          name={`${symbol} Price`}
+                          connectNulls={true}
+                          isAnimationActive={false}
+                          activeDot={{ r: 4 }}
+                        />
+                      ));
+                    })()}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
