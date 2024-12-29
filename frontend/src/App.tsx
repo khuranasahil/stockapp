@@ -188,11 +188,8 @@ function App() {
     setError(null)
 
     try {
-      // Use the production API URL
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      if (!apiBaseUrl) {
-        throw new Error('API base URL is not configured');
-      }
+      // Use the production API URL with fallback
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080';
       const url = `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`;
       console.log('Making request to:', url);
       
@@ -243,13 +240,18 @@ function App() {
     const value = event.target.value.toUpperCase()
     setTickers(value)
     
+    // Clear error only if it's the "Load Failed" message
+    if (error === 'Load Failed') {
+      setError(null)
+    }
+    
     if (DEBUG) {
       console.log('Ticker input updated:', {
         value,
         timestamp: new Date().toISOString()
       })
     }
-  }, [DEBUG])
+  }, [DEBUG, error])
 
   // Transform data for chart with optimized lookups and performance monitoring
   const transformDataForChart = useCallback((data: StockData['data']) => {
