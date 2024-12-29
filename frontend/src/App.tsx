@@ -133,7 +133,6 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   // Performance monitoring for state changes
   useEffect(() => {
@@ -153,9 +152,6 @@ function App() {
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
-      }
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
       }
     }
   }, [])
@@ -242,34 +238,7 @@ function App() {
 
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
-    
-    if (DEBUG) {
-      console.log('Ticker input change:', {
-        value,
-        timestamp: new Date().toISOString(),
-        isMobile,
-        isiPhone16Pro
-      })
-    }
-
-    // Cancel any ongoing requests before updating state
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-
-    // Update visual state immediately
     setTickers(value)
-    
-    // Clear any existing timeout
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    // Only clear data if input is empty
-    if (!value.trim()) {
-      setStockData(null)
-      setError(null)
-    }
     
     if (DEBUG) {
       console.log('Ticker input updated:', {
@@ -277,7 +246,7 @@ function App() {
         timestamp: new Date().toISOString()
       })
     }
-  }, [DEBUG, isMobile, isiPhone16Pro, handleSubmit])
+  }, [DEBUG])
 
   // Transform data for chart with optimized lookups and performance monitoring
   const transformDataForChart = useCallback((data: StockData['data']) => {
