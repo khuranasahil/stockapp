@@ -1,3 +1,4 @@
+# Clean static files before build\nRUN rm -rf /app/backend/target/* /app/backend/src/main/resources/static/assets/*
 # Build frontend
 FROM node:18-slim AS frontend-build
 WORKDIR /app/frontend
