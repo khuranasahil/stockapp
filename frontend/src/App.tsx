@@ -241,7 +241,7 @@ function App() {
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
     setTickers(value)
-    // Do not clear error state or trigger any side effects during typing
+    setError(null) // Clear any previous error messages during typing
     if (DEBUG) {
       console.log('Ticker input updated:', {
         value,
