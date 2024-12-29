@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 
 interface ChartDataPoint {
@@ -49,9 +49,6 @@ function App() {
       return
     }
 
-    // Request management simplified
-
-    // Only update loading state, keep previous data visible during fetch
     setLoading(true)
     setError(null)
 
@@ -60,35 +57,24 @@ function App() {
       if (!apiBaseUrl) {
         throw new Error('VITE_API_BASE_URL environment variable is required');
       }
-      const url = new URL('/api/stocks/eod', apiBaseUrl).toString();
-      console.log('Making request to:', url);
-      const headers = {
-        'Accept': 'application/json',
-        'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
-      };
       
-      const response = await fetch(`${url}?symbols=${encodeURIComponent(tickers)}`, {
+      const response = await fetch(`${apiBaseUrl}/api/stocks/eod?symbols=${encodeURIComponent(tickers)}`, {
         method: 'GET',
-        headers
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
+        }
       });
       
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Failed to fetch stock data: ${errorText}`)
+        throw new Error('Failed to fetch stock data')
       }
       
       const data = await response.json()
-      
-      // Batch state updates to prevent unnecessary re-renders
-      const stateUpdates = () => {
-        setStockData(data)
-        setError(null)
-      }
-      stateUpdates()
+      setStockData(data)
     } catch (err) {
       console.error('Fetch error:', err)
-      // Keep previous data visible on error
-      setError(err instanceof Error ? err.message : 'Failed to fetch stock data. Please try again.')
+      setError('Failed to fetch stock data. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -100,43 +86,25 @@ function App() {
     setError(null) // Clear any previous errors when user types
   }, [])
 
-  // Remove any auto-fetch behavior
-  useEffect(() => {
-    // Cleanup any previous error state when component mounts
-    return () => {
-      setError(null)
-    }
-  }, [])
-
-  // Transform data for chart with optimized lookups and performance monitoring
+  // Transform data for chart
   const transformDataForChart = useCallback((data: StockData['data']) => {
-    // Create Map for O(1) lookups
-    const dataMap = new Map(
-      data.map(item => {
-        // Date is already in ISO format, just parse it once
-        const date = new Date(item.date);
-        const dateStr = date.toLocaleDateString();
-        return [`${item.symbol}-${dateStr}`, item.close];
-      })
-    );
-    // Get and sort unique dates
-    const uniqueDates = [...new Set(
-      data.map(item => new Date(item.date)) // Date is already in ISO format
-    )].sort((a, b) => a.getTime() - b.getTime())
-      .map(date => date.toLocaleDateString());
-    // Get unique symbols
+    const uniqueDates = [...new Set(data.map(item => new Date(item.date).toLocaleDateString()))];
     const symbols = [...new Set(data.map(item => item.symbol))];
-    const result = uniqueDates.map(date => {
+    
+    return uniqueDates.map(date => {
       const dataPoint: ChartDataPoint = { date };
       symbols.forEach(symbol => {
-        dataPoint[`${symbol} Close`] = dataMap.get(`${symbol}-${date}`) ?? null;
+        const matchingData = data.find(item => 
+          new Date(item.date).toLocaleDateString() === date && 
+          item.symbol === symbol
+        );
+        dataPoint[`${symbol} Close`] = matchingData ? matchingData.close : null;
       });
       return dataPoint;
     });
-    return result;
   }, []);
 
-  // Memoize chart data with performance monitoring
+  // Memoize chart data
   const chartData = useMemo(() => {
     if (!stockData?.data) return [];
     return transformDataForChart(stockData.data);
