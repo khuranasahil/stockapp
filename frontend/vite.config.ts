@@ -4,7 +4,10 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:8080';
+  const apiBaseUrl = env.VITE_API_BASE_URL;
+  if (!apiBaseUrl) {
+    throw new Error('VITE_API_BASE_URL environment variable is required');
+  }
   console.log('Building with environment:', {
     mode,
     VITE_API_BASE_URL: apiBaseUrl,
