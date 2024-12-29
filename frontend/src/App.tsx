@@ -241,48 +241,83 @@ function App() {
 
   const handleTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
+    const startTime = performance.now()
     
     if (DEBUG) {
-      console.log('Ticker input change:', {
-        value,
-        timestamp: new Date().toISOString(),
-        isMobile,
-        isiPhone16Pro
-      })
+      try {
+        const memoryBefore = (window.performance as any).memory;
+        console.log('Ticker input change:', {
+          value,
+          timestamp: new Date().toISOString(),
+          isMobile,
+          isiPhone16Pro,
+          memoryBefore: memoryBefore ? {
+            usedJSHeapSize: Math.round(memoryBefore.usedJSHeapSize / (1024 * 1024)),
+            totalJSHeapSize: Math.round(memoryBefore.totalJSHeapSize / (1024 * 1024))
+          } : 'Not available'
+        })
+      } catch (err) {
+        console.debug('Memory metrics not available:', err)
+      }
     }
 
-    // Cancel any ongoing requests before updating state
+    // Cancel any ongoing requests and clear timeouts before updating state
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
-
-    // Update visual state immediately
-    setTickers(value)
-    
-    // Clear any existing timeout
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
     }
 
-    // Use longer debounce delay for mobile devices
+    // Update visual state immediately with performance tracking
+    const updateStartTime = performance.now()
+    setTickers(value)
+    
+    if (DEBUG) {
+      console.log('State update time:', {
+        operation: 'setTickers',
+        duration: performance.now() - updateStartTime,
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    // Adaptive debounce delay based on device and input length
     const debounceDelay = isiPhone16Pro ? 750 : isMobile ? 500 : 300
 
     // Only trigger submit if there's actual input
     if (value.trim()) {
       debounceTimerRef.current = setTimeout(() => {
         if (DEBUG) {
-          console.log('Debounce timer triggered:', {
-            value,
-            delay: debounceDelay,
-            timestamp: new Date().toISOString()
-          })
+          try {
+            const memoryAfter = (window.performance as any).memory;
+            console.log('Debounce timer triggered:', {
+              value,
+              delay: debounceDelay,
+              duration: performance.now() - startTime,
+              timestamp: new Date().toISOString(),
+              memory: memoryAfter ? {
+                usedJSHeapSize: Math.round(memoryAfter.usedJSHeapSize / (1024 * 1024)),
+                totalJSHeapSize: Math.round(memoryAfter.totalJSHeapSize / (1024 * 1024))
+              } : 'Not available'
+            })
+          } catch (err) {
+            console.debug('Memory metrics not available:', err)
+          }
         }
         handleSubmit()
       }, debounceDelay)
     } else {
-      // Clear data if input is empty
+      // Clear data if input is empty with performance tracking
+      const clearStartTime = performance.now()
       setStockData(null)
       setError(null)
+      
+      if (DEBUG) {
+        console.log('Clear data time:', {
+          duration: performance.now() - clearStartTime,
+          timestamp: new Date().toISOString()
+        })
+      }
     }
   }, [DEBUG, isMobile, isiPhone16Pro, handleSubmit])
 
