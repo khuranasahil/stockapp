@@ -1,4 +1,10 @@
-import { useState } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
+import ErrorBoundary from './components/ui/ErrorBoundary'
+
+interface ChartDataPoint {
+  date: string;
+  [key: string]: string | number | null;
+}
 import { useTheme } from 'next-themes'
 import { Moon, Sun, Loader2 } from 'lucide-react'
 import { Button } from "./components/ui/button"
@@ -32,6 +38,16 @@ function App() {
   const [stockData, setStockData] = useState<StockData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
 
   // Note: SSL certificate validation is handled at the browser level for development
 
@@ -41,11 +57,21 @@ function App() {
       return
     }
 
+    // Cancel any ongoing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Create new abort controller for this request
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    // Only update loading state, keep previous data visible during fetch
     setLoading(true)
     setError(null)
-    setStockData(null)
 
     try {
+      // Keep previous stockData visible while loading new data
       const url = `http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080/api/stocks/eod?symbols=${tickers}`;
       console.log('Making request to:', url);
       
@@ -59,7 +85,8 @@ function App() {
       const response = await fetch(url, {
         method: 'GET',
         headers,
-        mode: 'cors'
+        mode: 'cors',
+        signal: abortController.signal
       });
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       console.log('Response status:', response.status);
@@ -71,19 +98,62 @@ function App() {
       }
       
       const data = await response.json()
-      setStockData(data)
-      setError(null)
+      
+      // Batch state updates to prevent unnecessary re-renders
+      const stateUpdates = () => {
+        setStockData(data)
+        setError(null)
+      }
+      stateUpdates()
     } catch (err) {
       console.error('Fetch error:', err)
+      // Don't update error state if request was aborted
+      if (err instanceof Error && err.name === 'AbortError') {
+        return
+      }
+      // Keep previous data visible on error
       setError(err instanceof Error ? err.message : 'Failed to fetch stock data. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
+  // Memoize chart data transformation
+  const chartData = useMemo(() => {
+    if (!stockData?.data) return [];
+    
+    // Get unique dates and sort them
+    const dates = [...new Set(stockData.data.map(item => 
+      new Date(item.date).toLocaleDateString()
+    ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    
+    // Get unique symbols
+    const symbols = [...new Set(stockData.data.map(item => item.symbol))];
+    
+    // Create data points for each date
+    return dates.map(date => {
+      const dataPoint: ChartDataPoint = { date };
+      symbols.forEach(symbol => {
+        const matchingData = stockData.data.find(item => 
+          new Date(item.date).toLocaleDateString() === date && 
+          item.symbol === symbol
+        );
+        dataPoint[`${symbol} Close`] = matchingData ? matchingData.close : null;
+      });
+      return dataPoint;
+    });
+  }, [stockData?.data]);
+
+  // Memoize unique symbols and colors for the chart
+  const { uniqueSymbols, colors } = useMemo(() => ({
+    uniqueSymbols: stockData?.data ? [...new Set(stockData.data.map(d => d.symbol))] : [],
+    colors: ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899']
+  }), [stockData?.data]);
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
-      <Card className="w-full max-w-6xl dark:bg-gray-800 dark:text-gray-100">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+        <Card className="w-full max-w-6xl dark:bg-gray-800 dark:text-gray-100">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
@@ -169,36 +239,7 @@ function App() {
               <div className="w-full h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={(() => {
-                      if (!stockData?.data) return [];
-                      
-                      // Get unique dates and sort them
-                      const dates = [...new Set(stockData.data.map(item => 
-                        new Date(item.date).toLocaleDateString()
-                      ))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-                      
-                      // Get unique symbols
-                      const symbols = [...new Set(stockData.data.map(item => item.symbol))];
-                      
-                      // Create data points with numeric values for each symbol
-                      const formattedData = dates.map(date => {
-                        const dataPoint: any = { date };
-                        symbols.forEach(symbol => {
-                          const matchingData = stockData.data.find(item => 
-                            new Date(item.date).toLocaleDateString() === date && 
-                            item.symbol === symbol
-                          );
-                          if (matchingData) {
-                            dataPoint[symbol] = matchingData.close;
-                          } else {
-                            dataPoint[symbol] = null;
-                          }
-                        });
-                        return dataPoint;
-                      });
-                      console.log('Chart data:', formattedData);
-                      return formattedData;
-                    })()}
+                    data={chartData}
                     margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
@@ -233,25 +274,21 @@ function App() {
                       height={36}
                       iconType="circle"
                     />
-                    {(() => {
-                      if (!stockData?.data) return null;
-                      const uniqueSymbols = [...new Set(stockData.data.map(d => d.symbol))];
-                      const colors = ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899'];
-                      return uniqueSymbols.map((symbol, idx) => (
+                    {uniqueSymbols.map((symbol, idx) => (
                         <Line
                           key={symbol}
                           type="monotone"
-                          dataKey={symbol}
+                          dataKey={`${symbol} Close`}
                           stroke={colors[idx % colors.length]}
                           strokeWidth={2}
                           dot={false}
-                          name={`${symbol} Price`}
+                          name={`${symbol} Close Price`}
                           connectNulls={true}
                           isAnimationActive={false}
                           activeDot={{ r: 4 }}
+                          legendType="line"
                         />
-                      ));
-                    })()}
+                    ))}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -259,7 +296,8 @@ function App() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }
 
