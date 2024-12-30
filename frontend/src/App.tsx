@@ -56,8 +56,9 @@ function App() {
     setError(null)
 
     try {
-      // Use window.location.origin for API requests in production
-      const apiBaseUrl = window.location.origin;
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, 'with env:', apiBaseUrl);
       const url = `${apiBaseUrl}/api/stocks/eod`;
       
       const headers: Record<string, string> = {
