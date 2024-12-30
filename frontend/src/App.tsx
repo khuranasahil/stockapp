@@ -53,14 +53,9 @@ function App() {
     setError(null)
 
     try {
-      // In production or when VITE_USE_ORIGIN is true, use window.location.origin
-      const apiBaseUrl = import.meta.env.VITE_USE_ORIGIN === 'true' || import.meta.env.MODE === 'production' 
-        ? window.location.origin 
-        : (import.meta.env.VITE_API_BASE_URL || window.location.origin);
-      
+      const apiBaseUrl = import.meta.env.PROD ? window.location.origin : import.meta.env.VITE_API_BASE_URL;
       console.log('Environment:', import.meta.env.MODE);
       console.log('API Base URL:', apiBaseUrl);
-      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`);
       
       const response = await fetch(`${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, {
         method: 'GET',
