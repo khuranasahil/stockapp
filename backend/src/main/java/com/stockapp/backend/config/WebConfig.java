@@ -35,10 +35,6 @@ public class WebConfig {
                         .setCacheControl(CacheControl.noCache());
             }
 
-            @Override
-            public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-                configurer.enable();
-            }
         };
     }
 }
