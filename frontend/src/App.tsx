@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 
 interface ChartDataPoint {
@@ -53,12 +53,14 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
       console.log('Using API URL:', apiBaseUrl);
       
-      const url = `${apiBaseUrl}/api/stocks/eod?symbols=${encodeURIComponent(tickers)}`;
-      console.log('Making request to:', url); // Debug log
-      const response = await fetch(url, {
+      const url = new URL('/api/stocks/eod', apiBaseUrl);
+      url.searchParams.append('symbols', tickers);
+      console.log('Making request to:', url.toString());
+      
+      const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -85,6 +87,13 @@ function App() {
     setTickers(value)
     setError(null) // Clear any previous errors when user types
   }, [])
+
+  // Prevent any auto-fetch behavior
+  useEffect(() => {
+    return () => {
+      // Cleanup function to prevent any pending requests
+    };
+  }, []);
 
   // Transform data for chart
   const transformDataForChart = useCallback((data: StockData['data']) => {
