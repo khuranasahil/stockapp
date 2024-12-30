@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -17,15 +17,9 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(
-                            "http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com",
-                            "http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080",
-                            "http://localhost:5173"
-                        )
+                        .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .exposedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedHeaders("*");
             }
 
             @Override
@@ -35,6 +29,14 @@ public class WebConfig {
                         .setCacheControl(CacheControl.noCache());
             }
 
+            @Override
+            public void addViewControllers(ViewControllerRegistry registry) {
+                registry.addViewController("/").setViewName("forward:/index.html");
+                registry.addViewController("/{x:[\\w\\-]+}")
+                        .setViewName("forward:/index.html");
+                registry.addViewController("/{x:^(?!api$).*$}/**")
+                        .setViewName("forward:/index.html");
+            }
         };
     }
 }
