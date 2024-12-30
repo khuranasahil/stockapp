@@ -56,8 +56,8 @@ function App() {
     setError(null)
 
     try {
-      // Use window.location.origin for API requests in production
-      const apiBaseUrl = window.location.origin;
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
       const url = `${apiBaseUrl}/api/stocks/eod`;
       
       const headers: Record<string, string> = {
@@ -69,9 +69,7 @@ function App() {
         headers,
 
       });
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // Response handling
       
       if (!response.ok) {
         const errorText = await response.text()

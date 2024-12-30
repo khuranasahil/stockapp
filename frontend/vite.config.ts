@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL || env.VITE_API_BASE_URL || ''),
       'import.meta.env.VITE_AUTH_USERNAME': JSON.stringify(process.env.VITE_AUTH_USERNAME || env.VITE_AUTH_USERNAME || ''),
       'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(process.env.VITE_AUTH_PASSWORD || env.VITE_AUTH_PASSWORD || ''),
+      '__PROD__': mode === 'production'
     }
   }
 })
