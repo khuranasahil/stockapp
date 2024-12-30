@@ -21,8 +21,11 @@ WORKDIR /app
 # Copy the built JAR (which includes frontend static resources)
 COPY --from=builder /app/backend/target/backend-1.0.0-SNAPSHOT.jar app.jar
 
-# Run the application with port 80
-ENV PORT=80
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Run the application with port 8080
+ENV PORT=8080
 EXPOSE ${PORT}
 
 # Run the application
