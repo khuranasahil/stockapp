@@ -27,10 +27,10 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'import.meta.env': JSON.stringify({
-        VITE_API_BASE_URL: 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com:8080',
-        VITE_AUTH_USERNAME: 'stockapp',
-        VITE_AUTH_PASSWORD: 'stockapp123',
-        VITE_ALPHAVANTAGE_API_KEY: 'CLTNUH1J362422LR',
+        VITE_API_BASE_URL: env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com',
+        VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',
+        VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD || 'stockapp123',
+        VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY || 'CLTNUH1J362422LR',
         MODE: mode,
         DEV: mode === 'development',
         PROD: mode === 'production'
