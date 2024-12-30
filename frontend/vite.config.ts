@@ -4,10 +4,12 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_BASE_URL;
-  // Allow empty API base URL - we'll handle the fallback at runtime
+  const apiBaseUrl = env.VITE_API_BASE_URL || '';
+  // In production, we'll use window.location.origin
   console.log('Building with API base URL:', apiBaseUrl || 'EMPTY (will use window.location.origin at runtime)');
-  console.log('Using API base URL from env:', apiBaseUrl);
+  if (mode === 'production') {
+    console.log('Production build: will use window.location.origin at runtime');
+  }
   
   return {
     plugins: [react()],
@@ -30,6 +32,7 @@ export default defineConfig(({ mode }) => {
         VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME,
         VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD,
         VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY,
+        VITE_USE_ORIGIN: env.VITE_USE_ORIGIN,
         MODE: mode,
         DEV: mode === 'development',
         PROD: mode === 'production'
