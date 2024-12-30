@@ -54,20 +54,13 @@ function App() {
 
     try {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      if (!apiBaseUrl) {
-        throw new Error('API base URL not configured');
-      }
-      console.log('Using API URL:', apiBaseUrl);
+      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`);
       
-      const url = new URL('/api/stocks/eod', apiBaseUrl);
-      url.searchParams.append('symbols', tickers);
-      console.log('Making request to:', url.toString(), 'with env:', apiBaseUrl);
-      
-      const response = await fetch(url.toString(), {
+      const response = await fetch(`${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Authorization': `Basic ${btoa('stockapp:stockapp123')}`
+          'Authorization': `Basic ${btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`)}`
         }
       });
       
