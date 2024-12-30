@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig {
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer webConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -23,6 +23,18 @@ public class WebConfig {
                         .allowedHeaders("*")
                         .exposedHeaders("*")
                         .allowCredentials(true);
+            }
+
+            @Override
+            public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                registry.addResourceHandler("/**")
+                        .addResourceLocations("classpath:/static/")
+                        .setCacheControl(CacheControl.noCache());
+            }
+
+            @Override
+            public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+                configurer.enable();
             }
         };
     }
