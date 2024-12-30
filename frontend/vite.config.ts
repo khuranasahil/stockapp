@@ -4,8 +4,9 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = mode === 'production' ? '' : (env.VITE_API_BASE_URL || 'http://localhost:8080');
-  console.log('Building with API base URL:', mode === 'production' ? 'window.location.origin' : apiBaseUrl);
+  // In production, we'll use window.location.origin dynamically
+  const apiBaseUrl = '';
+  console.log('Building with API base URL:', 'Using window.location.origin');
   
   return {
     plugins: [react()],
