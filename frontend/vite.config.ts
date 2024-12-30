@@ -5,9 +5,8 @@ import { defineConfig, loadEnv } from "vite"
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const apiBaseUrl = env.VITE_API_BASE_URL;
-  if (!apiBaseUrl) {
-    throw new Error('VITE_API_BASE_URL environment variable is required');
-  }
+  // Allow empty API base URL - we'll handle the fallback at runtime
+  console.log('Building with API base URL:', apiBaseUrl || 'EMPTY (will use window.location.origin at runtime)');
   console.log('Using API base URL from env:', apiBaseUrl);
   
   return {
@@ -27,10 +26,10 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'import.meta.env': JSON.stringify({
-        VITE_API_BASE_URL: env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com',
-        VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME || 'stockapp',
-        VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD || 'stockapp123',
-        VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY || 'CLTNUH1J362422LR',
+        VITE_API_BASE_URL: env.VITE_API_BASE_URL,
+        VITE_AUTH_USERNAME: env.VITE_AUTH_USERNAME,
+        VITE_AUTH_PASSWORD: env.VITE_AUTH_PASSWORD,
+        VITE_ALPHAVANTAGE_API_KEY: env.VITE_ALPHAVANTAGE_API_KEY,
         MODE: mode,
         DEV: mode === 'development',
         PROD: mode === 'production'

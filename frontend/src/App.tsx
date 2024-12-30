@@ -53,8 +53,13 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`);
+      // In production, fallback to window.location.origin if VITE_API_BASE_URL is not set
+      const apiBaseUrl = import.meta.env.PROD && !import.meta.env.VITE_API_BASE_URL
+        ? window.location.origin
+        : import.meta.env.VITE_API_BASE_URL;
+      
+      console.log('Environment:', import.meta.env.MODE);
+      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, 'with env:', apiBaseUrl);
       
       const response = await fetch(`${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, {
         method: 'GET',
