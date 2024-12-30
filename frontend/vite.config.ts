@@ -4,8 +4,8 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
-  console.log('Using fixed API base URL:', apiBaseUrl);
+  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
+  console.log('Using API base URL from env:', apiBaseUrl);
   
   return {
     plugins: [react()],
