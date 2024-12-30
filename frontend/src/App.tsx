@@ -56,8 +56,9 @@ function App() {
     setError(null)
 
     try {
-      // Use environment variable for API base URL
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      // Use current hostname as API base URL
+      const apiBaseUrl = window.location.origin;
+      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod`, 'with env:', apiBaseUrl);
       const url = `${apiBaseUrl}/api/stocks/eod`;
       
       const headers: Record<string, string> = {
