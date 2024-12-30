@@ -57,8 +57,7 @@ function App() {
 
     try {
       // Use environment variable for API base URL
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
-      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, 'with env:', apiBaseUrl);
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
       const url = `${apiBaseUrl}/api/stocks/eod`;
       
       const headers: Record<string, string> = {
@@ -70,9 +69,7 @@ function App() {
         headers,
 
       });
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // Response handling
       
       if (!response.ok) {
         const errorText = await response.text()
