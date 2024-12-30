@@ -4,8 +4,7 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  // In production, we'll always use window.location.origin
-  const apiBaseUrl = mode === 'production' ? '' : (env.VITE_API_BASE_URL || 'http://localhost:80');
+  const apiBaseUrl = mode === 'production' ? '' : (env.VITE_API_BASE_URL || 'http://localhost:8080');
   console.log('Building with API base URL:', mode === 'production' ? 'window.location.origin' : apiBaseUrl);
   
   return {
@@ -24,7 +23,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(''),
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),
       'import.meta.env.VITE_AUTH_USERNAME': JSON.stringify(env.VITE_AUTH_USERNAME),
       'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(env.VITE_AUTH_PASSWORD),
       'import.meta.env.VITE_ALPHAVANTAGE_API_KEY': JSON.stringify(env.VITE_ALPHAVANTAGE_API_KEY),

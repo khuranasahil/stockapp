@@ -53,9 +53,10 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = import.meta.env.PROD ? window.location.origin : import.meta.env.VITE_API_BASE_URL;
+      const apiBaseUrl = window.location.origin;
       console.log('Environment:', import.meta.env.MODE);
-      console.log('API Base URL:', apiBaseUrl);
+      console.log('Using API base URL:', apiBaseUrl);
+      console.log('Making request to:', `${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`);
       
       const response = await fetch(`${apiBaseUrl}/api/stocks/eod?symbols=${tickers}`, {
         method: 'GET',
