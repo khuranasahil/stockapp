@@ -53,12 +53,15 @@ function App() {
     setError(null)
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://stockapp-lb-1859686354.us-east-2.elb.amazonaws.com';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        throw new Error('API base URL not configured');
+      }
       console.log('Using API URL:', apiBaseUrl);
       
       const url = new URL('/api/stocks/eod', apiBaseUrl);
       url.searchParams.append('symbols', tickers);
-      console.log('Making request to:', url.toString());
+      console.log('Making request to:', url.toString(), 'with env:', apiBaseUrl);
       
       const response = await fetch(url.toString(), {
         method: 'GET',
