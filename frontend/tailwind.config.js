@@ -19,7 +19,34 @@ module.exports = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+        theme: {
+          orange: 'hsl(var(--theme-orange))',
+          input: {
+            dark: 'hsl(var(--theme-input-dark))',
+            light: 'hsl(var(--theme-input-light))'
+          },
+          table: {
+            header: {
+              primary: 'hsl(var(--theme-table-header-primary))',
+              alt: 'hsl(var(--theme-table-header-alt))',
+              child: {
+                aqua: 'hsl(var(--theme-table-header-child-aqua))',
+                yellow: 'hsl(var(--theme-table-header-child-yellow))',
+                green: 'hsl(var(--theme-table-header-child-green))',
+                violet: 'hsl(var(--theme-table-header-child-violet))',
+                turquoise: 'hsl(var(--theme-table-header-child-turquoise))',
+                red: 'hsl(var(--theme-table-header-child-red))'
+              }
+            }
+          }
+        },
+        semantic: {
+          success: 'hsl(var(--semantic-success))',
+          error: 'hsl(var(--semantic-error))',
+          info: 'hsl(var(--semantic-info))',
+          warning: 'hsl(var(--semantic-warning))'
+        }
   		},
   		keyframes: {
   			'accordion-down': {

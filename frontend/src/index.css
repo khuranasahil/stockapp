@@ -12,7 +12,29 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Theme Colors */
+    --theme-orange: 32 94% 47%;          /* #F78A09 */
+    --theme-input-light: 0 0% 87%;       /* #DFDFDF */
+    --theme-input-dark: 0 0% 16%;        /* #292929 */
+    
+    /* Table Header Colors */
+    --theme-table-header-primary: 220 24% 34%;    /* #42516B */
+    --theme-table-header-alt: 217 17% 28%;        /* #3C4554 */
+    --theme-table-header-child-aqua: 199 71% 60% / 0.6;      /* #4DBAE4 60% */
+    --theme-table-header-child-yellow: 44 83% 55% / 0.8;     /* #EEBE2A 80% */
+    --theme-table-header-child-green: 120 80% 75% / 0.6;     /* #94EE94 60% */
+    --theme-table-header-child-violet: 320 45% 62% / 0.6;    /* #C479B2 60% */
+    --theme-table-header-child-turquoise: 184 90% 35% / 0.6; /* #09A1AD 60% */
+    --theme-table-header-child-red: 6 78% 57% / 0.6;         /* #E74C3C 60% */
+    
+    /* Semantic Colors */
+    --semantic-success: 120 54% 44%;     /* #4FAD32 */
+    --semantic-error: 4 81% 57%;         /* #E74C3C */
+    --semantic-info: 207 100% 40%;       /* #007ACC */
+    --semantic-warning: 44 83% 55%;      /* #EEBE2A */
+  }
   .dark {
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -21,7 +43,18 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Theme Colors - Dark Mode */
+    --theme-orange: 32 94% 47%;          /* #F78A09 */
+    --theme-input-light: 0 0% 87%;       /* #DFDFDF */
+    --theme-input-dark: 0 0% 16%;        /* #292929 */
+    
+    /* Semantic Colors - Dark Mode */
+    --semantic-success: 120 54% 44%;     /* #4FAD32 */
+    --semantic-error: 4 81% 57%;         /* #E74C3C */
+    --semantic-info: 207 100% 40%;       /* #007ACC */
+    --semantic-warning: 44 83% 55%;      /* #EEBE2A */
   }
 }
 

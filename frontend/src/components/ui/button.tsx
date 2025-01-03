@@ -5,20 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 dark:focus-visible:ring-zinc-300",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-orange/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-zinc-900 text-zinc-50 shadow hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90",
+          "bg-gradient-to-r from-theme-orange to-theme-orange/90 text-white shadow hover:from-theme-orange/90 hover:to-theme-orange/80 dark:from-theme-orange dark:to-theme-orange/90 dark:text-white dark:hover:from-theme-orange/90 dark:hover:to-theme-orange/80",
         destructive:
-          "bg-red-500 text-zinc-50 shadow-sm hover:bg-red-500/90 dark:bg-red-900 dark:text-zinc-50 dark:hover:bg-red-900/90",
+          "bg-semantic-error text-white shadow-sm hover:bg-semantic-error/90 dark:bg-semantic-error dark:text-white dark:hover:bg-semantic-error/90",
         outline:
-          "border border-zinc-200 bg-white shadow-sm hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
+          "border border-theme-orange/20 bg-white shadow-sm hover:bg-theme-orange/10 hover:text-theme-orange dark:border-theme-orange/20 dark:bg-zinc-950 dark:hover:bg-theme-orange/20 dark:hover:text-theme-orange",
         secondary:
           "bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-100/80 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-800/80",
-        ghost: "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
-        link: "text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-50",
+        ghost: "text-theme-orange hover:bg-theme-orange/10 hover:text-theme-orange dark:text-theme-orange dark:hover:bg-theme-orange/20",
+        link: "text-theme-orange underline-offset-4 hover:underline dark:text-theme-orange",
       },
       size: {
         default: "h-9 px-4 py-2",

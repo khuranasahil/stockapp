@@ -41,7 +41,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:text-zinc-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-zinc-100/50 data-[state=open]:bg-zinc-100/50 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:focus:bg-zinc-800 dark:focus:text-zinc-50 dark:data-[active]:bg-zinc-800/50 dark:data-[state=open]:bg-zinc-800/50"
+  "group inline-flex h-9 w-max items-center justify-center rounded-none bg-zinc-900 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800 hover:text-theme-orange focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:border-t-4 data-[active]:border-theme-orange data-[active]:text-theme-orange data-[state=open]:bg-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-theme-orange dark:focus:text-theme-orange dark:data-[active]:border-t-4 dark:data-[active]:border-theme-orange dark:data-[active]:text-theme-orange dark:data-[state=open]:bg-zinc-800"
 )
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -55,7 +55,7 @@ const NavigationMenuTrigger = React.forwardRef<
   >
     {children}{""}
     <ChevronDown
-      className="relative top-[1px] ml-1 h-3 w-3 transition duration-300 group-data-[state=open]:rotate-180"
+      className="relative top-[1px] ml-1 h-4 w-4 transition duration-300 group-data-[state=open]:rotate-180"
       aria-hidden="true"
     />
   </NavigationMenuPrimitive.Trigger>
