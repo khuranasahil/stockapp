@@ -1,17 +1,16 @@
-import { useState, useMemo, useCallback } from 'react'
+import * as React from 'react'
+import type { FC } from 'react'
+const { useState, useMemo, useCallback } = React
 import ErrorBoundary from './components/ui/ErrorBoundary'
 
-interface ChartDataPoint {
-  date: string;
-  [key: string]: string | number | null;
-}
-import { useTheme } from 'next-themes'
+import type { ChartDataPoint } from './components/Chart'
+import { useThemeToggle } from './hooks/useThemeToggle'
 import { Moon, Sun, Loader2 } from 'lucide-react'
 import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { ScrollArea } from "./components/ui/scroll-area"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { Chart } from './components/Chart'
 
 interface StockData {
   pagination: {
@@ -32,18 +31,18 @@ interface StockData {
   }>;
 }
 
-function App() {
+const App: FC = () => {
   const userAgent = typeof window !== 'undefined' ? navigator.userAgent : ''
   const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent)
 
-  const { theme, setTheme } = useTheme()
+  const { theme, toggleTheme } = useThemeToggle()
   const [tickers, setTickers] = useState('')
   const [stockData, setStockData] = useState<StockData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // State change monitoring removed for simplification
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!tickers.trim()) {
       setError('Please enter at least one ticker symbol')
       return
@@ -77,7 +76,7 @@ function App() {
         throw new Error(`Failed to fetch stock data: ${errorText}`)
       }
       
-      const data = await response.json()
+      const data: StockData = await response.json()
       
       // Batch state updates to prevent unnecessary re-renders
       const stateUpdates = () => {
@@ -100,9 +99,9 @@ function App() {
   }, [])
 
   // Transform data for chart with optimized lookups and performance monitoring
-  const transformDataForChart = useCallback((data: StockData['data']) => {
+  const transformDataForChart = useCallback((data: StockData['data']): ChartDataPoint[] => {
     // Create Map for O(1) lookups
-    const dataMap = new Map(
+    const dataMap = new Map<string, number>(
       data.map(item => {
         // Date is already in ISO format, just parse it once
         const date = new Date(item.date);
@@ -128,13 +127,13 @@ function App() {
   }, []);
 
   // Memoize chart data with performance monitoring
-  const chartData = useMemo(() => {
+  const chartData = useMemo((): ChartDataPoint[] => {
     if (!stockData?.data) return [];
     return transformDataForChart(stockData.data);
   }, [stockData?.data, transformDataForChart]);
 
   // Memoize unique symbols and colors for the chart
-  const { uniqueSymbols, colors } = useMemo(() => ({
+  const { uniqueSymbols, colors } = useMemo((): { uniqueSymbols: string[]; colors: string[] } => ({
     uniqueSymbols: stockData?.data ? [...new Set(stockData.data.map(d => d.symbol))] : [],
     colors: ['#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#EC4899']
   }), [stockData?.data]);
@@ -154,7 +153,7 @@ function App() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               className="dark:bg-gray-700 dark:hover:bg-gray-600"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -223,65 +222,13 @@ function App() {
           )}
 
           {stockData && stockData.data && stockData.data.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-4 dark:text-gray-100">Stock Price History</h3>
-              <div className="w-full h-[400px]">
-                <ResponsiveContainer width="100%" height="100%" debounce={isMobile ? 150 : 50}>
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke={theme === 'dark' ? '#9CA3AF' : '#4B5563'}
-                    />
-                    <YAxis 
-                      stroke={theme === 'dark' ? '#9CA3AF' : '#4B5563'}
-                      tickFormatter={(value) => `$${value.toFixed(2)}`}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
-                        border: '1px solid #374151',
-                        borderRadius: '0.375rem',
-                        padding: '10px'
-                      }}
-                      labelStyle={{
-                        color: theme === 'dark' ? '#E5E7EB' : '#111827',
-                        marginBottom: '5px'
-                      }}
-                      formatter={(value, name) => [`$${Number(value).toFixed(2)}`, `${name}`]}
-                      labelFormatter={(label) => `Date: ${label}`}
-                    />
-                    <Legend 
-                      wrapperStyle={{ 
-                        paddingTop: '20px',
-                        color: theme === 'dark' ? '#E5E7EB' : '#111827'
-                      }}
-                      verticalAlign="bottom"
-                      height={36}
-                      iconType="circle"
-                    />
-                    {uniqueSymbols.map((symbol, idx) => (
-                        <Line
-                          key={symbol}
-                          type="monotone"
-                          dataKey={`${symbol} Close`}
-                          stroke={colors[idx % colors.length]}
-                          strokeWidth={2}
-                          dot={false}
-                          name={`${symbol} Close Price`}
-                          connectNulls={true}
-                          isAnimationActive={false}
-                          activeDot={{ r: 4 }}
-                          legendType="line"
-                        />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            <Chart
+              data={chartData}
+              theme={theme}
+              isMobile={isMobile}
+              uniqueSymbols={uniqueSymbols}
+              colors={colors}
+            />
           )}
         </CardContent>
       </Card>
