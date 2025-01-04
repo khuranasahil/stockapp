@@ -3,8 +3,9 @@
 @tailwind utilities;
 @layer base {
   :root {
-    --radius: 0.5rem
-  ;
+    --radius: 0.5rem;
+
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -14,10 +15,75 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Theme Colors */
-    --theme-orange: 32 94% 47%;          /* #F78A09 */
-    --theme-input-light: 0 0% 87%;       /* #DFDFDF */
-    --theme-input-dark: 0 0% 16%;        /* #292929 */
+    /* Primary Colors */
+    --color-primary: 207 100% 40%;       /* #007ACC */
+    --color-background: 60 6% 95%;       /* #F3F3F2 */
+    --color-primary-bg: 0 0% 100%;       /* #FFFFFF */
+    
+    /* Text Colors */
+    --color-body-text-1: 0 0% 32%;       /* #515151 */
+    --color-body-text-2: 0 0% 20%;       /* #333333 */
+    --color-text-emphasize: 0 0% 0%;     /* #000000 */
+    
+    /* Semantic Colors - Light Theme */
+    --semantic-info-strong: 199 71% 60%;     /* #4DBAE4 */
+    --semantic-info-faded: 197 85% 92%;      /* #DBF1FA */
+    --semantic-info-dark: 203 100% 24%;      /* #00497A */
+    
+    --semantic-success-strong: 120 54% 44%;   /* #4FAD32 */
+    --semantic-success-faded: 120 54% 92%;    /* Adjusted for consistency */
+    --semantic-success-dark: 120 54% 24%;     /* Adjusted for consistency */
+    
+    --semantic-warning-strong: 44 83% 55%;    /* #EEBE2A */
+    --semantic-warning-faded: 44 83% 92%;     /* #FCF2D4 */
+    --semantic-warning-dark: 44 83% 24%;      /* #715709 */
+    
+    /* Using JSON spec error color as it's more recent */
+    --semantic-error-strong: 3 75% 54%;       /* #E32F32 */
+    --semantic-error-faded: 3 75% 92%;        /* Adjusted for consistency */
+    --semantic-error-dark: 3 75% 24%;         /* Adjusted for consistency */
+    
+    /* Grey Scale System */
+    --grey-950: 0 0% 10%;    /* #191919 */
+    --grey-900: 0 0% 15%;    /* #262626 */
+    --grey-850: 0 0% 20%;    /* #333333 */
+    --grey-800: 0 0% 22%;    /* #393939 */
+    --grey-750: 0 0% 27%;    /* #444444 */
+    --grey-700: 0 0% 32%;    /* #515151 */
+    --grey-650: 0 0% 44%;    /* #6F6F6F */
+    --grey-600: 0 0% 50%;    /* #7F7F7F */
+    --grey-500: 0 0% 73%;    /* #B9B9B9 */
+    --grey-400: 0 0% 78%;    /* #C6C6C6 */
+    --grey-300: 0 0% 87%;    /* #DFDFDF */
+    --grey-200: 0 0% 94%;    /* #EFEFEF */
+    --grey-100: 0 0% 95%;    /* #F2F2F2 */
+    --grey-50: 210 33% 98%;  /* #F7F9FA */
+    
+    /* Additional UI Colors */
+    --color-turquoise: 184 90% 35%;      /* #09A1AD */
+    --color-dark-cyan: 182 94% 24%;      /* #057774 */
+    --color-light-plumb: 320 45% 62%;    /* #C479B2 */
+    --color-lavender: 270 35% 56%;       /* #8F6CAF */
+    --color-orchid: 285 62% 50%;         /* #9C30CE */
+    --color-purple: 270 50% 34%;         /* #582C83 */
+    --color-butter: 43 86% 61%;          /* #F1C345 */
+    --color-pumpkin: 22 88% 43%;         /* #D1570D */
+    --color-salmon: 14 100% 71%;         /* #FF8A6C */
+    --color-burgundy: 350 38% 38%;       /* #873E4C */
+    --color-coral: 3 71% 60%;            /* #E05650 */
+    --color-old-brick: 358 67% 35%;      /* #941C21 */
+    --color-olive: 61 57% 35%;           /* #898C26 */
+    --color-moss: 67 85% 19%;            /* #4F5B07 */
+    --color-forest: 112 65% 31%;         /* #2C821C */
+    --color-parsley: 123 39% 26%;        /* #295D28 */
+    --color-light-blue: 197 71% 77%;     /* #9FDBED */
+    --color-aqua-blue: 199 71% 60%;      /* #4DBAE4 */
+    --color-bahama-blue: 203 100% 29%;   /* #006496 */
+    --color-regal-blue: 207 80% 24%;     /* #0C436D */
+    
+    /* Special Purpose Colors */
+    --color-trend-gain: 142 83% 27%;     /* #0B8043 */
+    --color-trend-loss: 0 100% 41%;      /* #D10000 */
     
     /* Table Header Colors */
     --theme-table-header-primary: 220 24% 34%;    /* #42516B */
@@ -28,14 +94,10 @@
     --theme-table-header-child-violet: 320 45% 62% / 0.6;    /* #C479B2 60% */
     --theme-table-header-child-turquoise: 184 90% 35% / 0.6; /* #09A1AD 60% */
     --theme-table-header-child-red: 6 78% 57% / 0.6;         /* #E74C3C 60% */
-    
-    /* Semantic Colors */
-    --semantic-success: 120 54% 44%;     /* #4FAD32 */
-    --semantic-error: 4 81% 57%;         /* #E74C3C */
-    --semantic-info: 207 100% 40%;       /* #007ACC */
-    --semantic-warning: 44 83% 55%;      /* #EEBE2A */
   }
+  
   .dark {
+    /* Sidebar */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -45,16 +107,38 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Theme Colors - Dark Mode */
-    --theme-orange: 32 94% 47%;          /* #F78A09 */
-    --theme-input-light: 0 0% 87%;       /* #DFDFDF */
-    --theme-input-dark: 0 0% 16%;        /* #292929 */
+    /* Primary Colors */
+    --color-primary: 32 94% 48%;         /* #F78B08 */
+    --color-background: 0 0% 15%;        /* #262626 */
+    --color-primary-bg: 0 0% 20%;        /* #333333 */
     
-    /* Semantic Colors - Dark Mode */
-    --semantic-success: 120 54% 44%;     /* #4FAD32 */
-    --semantic-error: 4 81% 57%;         /* #E74C3C */
-    --semantic-info: 207 100% 40%;       /* #007ACC */
-    --semantic-warning: 44 83% 55%;      /* #EEBE2A */
+    /* Text Colors */
+    --color-body-text-1: 0 0% 87%;       /* #DFDFDF */
+    --color-body-text-2: 0 0% 94%;       /* #EFEFEF */
+    --color-text-emphasize: 0 0% 100%;   /* #FFFFFF */
+    
+    /* Semantic Colors - Dark Theme */
+    --semantic-info-strong: 207 100% 40%;     /* #007ACC */
+    --semantic-info-faded: 207 100% 92%;      /* Adjusted for consistency */
+    --semantic-info-dark: 207 100% 24%;       /* Adjusted for consistency */
+    
+    --semantic-success-strong: 120 54% 44%;   /* #4FAD32 */
+    --semantic-success-faded: 120 54% 92%;    /* Adjusted for consistency */
+    --semantic-success-dark: 120 54% 24%;     /* Adjusted for consistency */
+    
+    --semantic-warning-strong: 44 83% 55%;    /* #EEBE2A */
+    --semantic-warning-faded: 44 83% 92%;     /* Adjusted for consistency */
+    --semantic-warning-dark: 44 83% 24%;      /* Adjusted for consistency */
+    
+    
+    /* Using JSON spec error color as it's more recent */
+    --semantic-error-strong: 3 75% 54%;       /* #E32F32 */
+    --semantic-error-faded: 3 75% 92%;        /* Adjusted for consistency */
+    --semantic-error-dark: 3 75% 24%;         /* Adjusted for consistency */
+    
+    /* Special Purpose Colors - Dark Theme */
+    --color-trend-gain: 157 71% 50%;     /* #20DF89 */
+    --color-trend-loss: 0 100% 71%;      /* #FF6B6B */
   }
 }
 

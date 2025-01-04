@@ -9,7 +9,7 @@ const Table = React.forwardRef<
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
+      className={cn("w-full caption-bottom text-sm bg-primary-bg dark:bg-primary-bg", className)}
       {...props}
     />
   </div>
@@ -25,13 +25,13 @@ const TableHeader = React.forwardRef<
     className={cn(
       "text-white divide-y divide-white/10",
       "[&_tr]:border-b border-white/10",
-      "[&_tr:first-child]:bg-theme-table-header-primary",
-      "[&_tr:not(:first-child)]:bg-theme-table-header-child-aqua",
-      "[&_tr:not(:first-child):nth-child(2n)]:bg-theme-table-header-child-yellow",
-      "[&_tr:not(:first-child):nth-child(3n)]:bg-theme-table-header-child-green",
-      "[&_tr:not(:first-child):nth-child(4n)]:bg-theme-table-header-child-violet",
-      "[&_tr:not(:first-child):nth-child(5n)]:bg-theme-table-header-child-turquoise",
-      "[&_tr:not(:first-child):nth-child(6n)]:bg-theme-table-header-child-red",
+      "[&_tr:first-child]:bg-table-header-primary",
+      "[&_tr:not(:first-child)]:bg-table-header-child-aqua/60",
+      "[&_tr:not(:first-child):nth-child(2n)]:bg-table-header-child-yellow/80",
+      "[&_tr:not(:first-child):nth-child(3n)]:bg-table-header-child-green/60",
+      "[&_tr:not(:first-child):nth-child(4n)]:bg-table-header-child-violet/60",
+      "[&_tr:not(:first-child):nth-child(5n)]:bg-table-header-child-turquoise/60",
+      "[&_tr:not(:first-child):nth-child(6n)]:bg-table-header-child-red/60",
       className
     )} 
     {...props} 
@@ -58,7 +58,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t bg-zinc-100/50 font-medium [&>tr]:last:border-b-0 dark:bg-zinc-800/50",
+      "border-t bg-grey-100/50 font-medium [&>tr]:last:border-b-0 dark:bg-grey-800/50",
       className
     )}
     {...props}
@@ -73,7 +73,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-zinc-100/50 data-[state=selected]:bg-zinc-100 dark:hover:bg-zinc-800/50 dark:data-[state=selected]:bg-zinc-800",
+      "border-b border-grey-200 transition-colors hover:bg-grey-100/50 data-[state=selected]:bg-grey-100 dark:border-grey-700 dark:hover:bg-grey-800/50 dark:data-[state=selected]:bg-grey-800",
       className
     )}
     {...props}
@@ -88,7 +88,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-10 px-2 text-left align-middle font-medium text-white [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+      "h-10 px-2 text-left align-middle font-medium text-text-emphasize [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
       className
     )}
     {...props}
@@ -103,7 +103,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+      "p-2 align-middle text-text-body1 dark:text-text-body1 [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
       className
     )}
     {...props}
@@ -117,7 +117,7 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn("mt-4 text-sm text-zinc-500 dark:text-zinc-400", className)}
+    className={cn("mt-4 text-sm text-text-body2 dark:text-text-body2", className)}
     {...props}
   />
 ))

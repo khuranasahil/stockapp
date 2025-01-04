@@ -5,20 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-orange/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-theme-orange to-theme-orange/90 text-white shadow hover:from-theme-orange/90 hover:to-theme-orange/80 dark:from-theme-orange dark:to-theme-orange/90 dark:text-white dark:hover:from-theme-orange/90 dark:hover:to-theme-orange/80",
+          "bg-gradient-to-r from-primary to-primary/90 text-text-emphasize shadow hover:from-primary/90 hover:to-primary/80 dark:from-primary dark:to-primary/90 dark:text-text-emphasize dark:hover:from-primary/90 dark:hover:to-primary/80",
         destructive:
-          "bg-semantic-error text-white shadow-sm hover:bg-semantic-error/90 dark:bg-semantic-error dark:text-white dark:hover:bg-semantic-error/90",
+          "bg-semantic-error-strong text-text-emphasize shadow-sm hover:bg-semantic-error-strong/90 dark:bg-semantic-error-strong dark:text-text-emphasize dark:hover:bg-semantic-error-strong/90",
         outline:
-          "border border-theme-orange/20 bg-white shadow-sm hover:bg-theme-orange/10 hover:text-theme-orange dark:border-theme-orange/20 dark:bg-zinc-950 dark:hover:bg-theme-orange/20 dark:hover:text-theme-orange",
+          "border border-primary/20 bg-primary-bg shadow-sm hover:bg-primary/10 hover:text-primary dark:border-primary/20 dark:bg-grey-950 dark:hover:bg-primary/20 dark:hover:text-primary",
         secondary:
-          "bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-100/80 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-800/80",
-        ghost: "text-theme-orange hover:bg-theme-orange/10 hover:text-theme-orange dark:text-theme-orange dark:hover:bg-theme-orange/20",
-        link: "text-theme-orange underline-offset-4 hover:underline dark:text-theme-orange",
+          "bg-grey-100 text-text-body1 shadow-sm hover:bg-grey-200/80 dark:bg-grey-800 dark:text-text-body1 dark:hover:bg-grey-700",
+        ghost: "text-primary hover:bg-primary/10 hover:text-primary dark:text-primary dark:hover:bg-primary/20",
+        link: "text-primary underline-offset-4 hover:underline dark:text-primary",
       },
       size: {
         default: "h-9 px-4 py-2",
