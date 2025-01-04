@@ -119,6 +119,21 @@
                         <configuration>
                             <target>
                                 <delete dir="${project.build.directory}/classes/static"/>
+                                <!-- Ensure assets directory is cleaned even if it exists outside of classes/static -->
+                                <delete dir="${project.build.directory}/classes/static/assets"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <!-- Additional cleanup before prepare-package phase -->
+                    <execution>
+                        <id>clean-before-copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete dir="${project.build.directory}/classes/static/assets"/>
                             </target>
                         </configuration>
                     </execution>
