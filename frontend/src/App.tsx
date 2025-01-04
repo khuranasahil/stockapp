@@ -193,26 +193,29 @@ const App: FC = () => {
               <div className="p-4">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="bg-gray-100 dark:bg-gray-700">
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">Symbol</th>
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">Date</th>
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">Open</th>
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">High</th>
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">Low</th>
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">Close</th>
-                      <th className="p-3 text-left dark:text-gray-100 font-medium">Volume</th>
+                    <tr className="bg-theme-table-header-primary">
+                      <th colSpan={7} className="p-3 text-left text-white font-medium">Stock Data Overview</th>
+                    </tr>
+                    <tr className="bg-theme-table-header-child-aqua">
+                      <th className="p-3 text-left text-white font-medium">Symbol</th>
+                      <th className="p-3 text-left text-white font-medium">Date</th>
+                      <th className="p-3 text-left text-white font-medium">Open</th>
+                      <th className="p-3 text-left text-white font-medium">High</th>
+                      <th className="p-3 text-left text-white font-medium">Low</th>
+                      <th className="p-3 text-left text-white font-medium">Close</th>
+                      <th className="p-3 text-left text-white font-medium">Volume</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stockData.data.map((item, index) => (
-                      <tr key={index} className="border-t dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td className="p-3 dark:text-gray-200">{item.symbol}</td>
-                        <td className="p-3 dark:text-gray-200">{new Date(item.date).toLocaleDateString()}</td>
-                        <td className="p-3 dark:text-gray-200">${item.open.toFixed(2)}</td>
-                        <td className="p-3 dark:text-gray-200">${item.high.toFixed(2)}</td>
-                        <td className="p-3 dark:text-gray-200">${item.low.toFixed(2)}</td>
-                        <td className="p-3 dark:text-gray-200">${item.close.toFixed(2)}</td>
-                        <td className="p-3 dark:text-gray-200">{item.volume.toLocaleString()}</td>
+                      <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="p-3 text-gray-900 dark:text-gray-200">{item.symbol}</td>
+                        <td className="p-3 text-gray-900 dark:text-gray-200">{new Date(item.date).toLocaleDateString()}</td>
+                        <td className="p-3 text-gray-900 dark:text-gray-200">${item.open.toFixed(2)}</td>
+                        <td className="p-3 text-gray-900 dark:text-gray-200">${item.high.toFixed(2)}</td>
+                        <td className="p-3 text-gray-900 dark:text-gray-200">${item.low.toFixed(2)}</td>
+                        <td className="p-3 text-gray-900 dark:text-gray-200">${item.close.toFixed(2)}</td>
+                        <td className="p-3 text-gray-900 dark:text-gray-200">{item.volume.toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>
