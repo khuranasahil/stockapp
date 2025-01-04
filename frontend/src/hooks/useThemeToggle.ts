@@ -1,5 +1,6 @@
 import { useTheme } from 'next-themes'
-import type { Theme } from 'next-themes'
+
+type Theme = 'light' | 'dark'
 
 interface ThemeToggle {
   theme: Theme | undefined;
@@ -10,11 +11,12 @@ export function useThemeToggle(): ThemeToggle {
   const { theme, setTheme } = useTheme()
   
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
+    const currentTheme = theme as Theme
+    setTheme(currentTheme === 'dark' ? 'light' : 'dark')
   }
 
   return {
-    theme,
+    theme: theme as Theme | undefined,
     toggleTheme
   }
 }
