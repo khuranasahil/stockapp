@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-primary to-primary/90 text-text-emphasize shadow hover:from-primary/90 hover:to-primary/80 dark:from-primary dark:to-primary/90 dark:text-text-emphasize dark:hover:from-primary/90 dark:hover:to-primary/80",
+          "bg-gradient-to-r from-[#F78A09] to-[#D1570D] text-white shadow hover:opacity-90 dark:from-[#F78A09] dark:to-[#D1570D] dark:text-white dark:hover:opacity-90",
         destructive:
-          "bg-semantic-error-strong text-text-emphasize shadow-sm hover:bg-semantic-error-strong/90 dark:bg-semantic-error-strong dark:text-text-emphasize dark:hover:bg-semantic-error-strong/90",
+          "bg-[#E74C3C] text-white shadow-sm hover:opacity-90 dark:bg-[#E74C3C] dark:text-white dark:hover:opacity-90",
         outline:
-          "border border-primary/20 bg-primary-bg shadow-sm hover:bg-primary/10 hover:text-primary dark:border-primary/20 dark:bg-grey-950 dark:hover:bg-primary/20 dark:hover:text-primary",
+          "border border-[#F78A09]/20 bg-[#FFFFFF] shadow-sm hover:bg-[#F78A09]/10 hover:text-[#F78A09] dark:border-[#F78A09]/20 dark:bg-[#262626] dark:hover:bg-[#F78A09]/20 dark:hover:text-[#F78A09]",
         secondary:
-          "bg-grey-100 text-text-body1 shadow-sm hover:bg-grey-200/80 dark:bg-grey-800 dark:text-text-body1 dark:hover:bg-grey-700",
-        ghost: "text-primary hover:bg-primary/10 hover:text-primary dark:text-primary dark:hover:bg-primary/20",
-        link: "text-primary underline-offset-4 hover:underline dark:text-primary",
+          "bg-[#F2F2F2] text-[#333333] shadow-sm hover:bg-[#EFEFEF]/80 dark:bg-[#333333] dark:text-[#DFDFDF] dark:hover:bg-[#444444]",
+        ghost: "text-[#F78A09] hover:bg-[#F78A09]/10 hover:text-[#F78A09] dark:text-[#F78A09] dark:hover:bg-[#F78A09]/20",
+        link: "text-[#F78A09] underline-offset-4 hover:underline dark:text-[#F78A09]",
       },
       size: {
         default: "h-9 px-4 py-2",

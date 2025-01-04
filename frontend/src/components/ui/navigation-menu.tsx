@@ -41,7 +41,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-9 w-max items-center justify-center rounded-none bg-primary-bg px-4 py-2 text-sm font-medium transition-colors hover:bg-ui-pumpkin hover:text-text-emphasize focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:border-t-4 data-[active]:border-primary data-[active]:text-primary data-[state=open]:bg-grey-850 dark:bg-primary-bg dark:hover:bg-grey-950 dark:hover:text-primary dark:focus:text-primary dark:data-[active]:border-t-4 dark:data-[active]:border-primary dark:data-[active]:text-primary dark:data-[state=open]:bg-grey-850"
+  "group inline-flex h-9 w-max items-center justify-center rounded-none bg-primary-bg px-4 py-2 text-sm font-medium transition-colors hover:bg-[#D1570D] hover:text-text-emphasize focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:border-t-4 data-[active]:border-[#F78A09] data-[active]:text-[#F78A09] data-[state=open]:bg-[#262626] dark:bg-primary-bg dark:hover:bg-black dark:hover:text-[#F78A09] dark:focus:text-[#F78A09] dark:data-[active]:border-t-4 dark:data-[active]:border-[#F78A09] dark:data-[active]:text-[#F78A09] dark:data-[state=open]:bg-[#262626]"
 )
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -55,7 +55,7 @@ const NavigationMenuTrigger = React.forwardRef<
   >
     {children}{""}
     <ChevronDown
-      className="relative top-[1px] ml-1 h-4 w-4 transition duration-300 group-data-[state=open]:rotate-180"
+      className="relative top-[1px] ml-1 h-[16px] w-[16px] transition duration-300 group-data-[state=open]:rotate-180"
       aria-hidden="true"
     />
   </NavigationMenuPrimitive.Trigger>

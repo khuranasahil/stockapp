@@ -196,7 +196,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width] bg-[#333333] hover:bg-black data-[state=expanded]:bg-[#262626] data-[selected=true]:bg-[#F78A09] p-0 text-text-body1/85 [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -246,7 +246,7 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+            className="flex h-full w-full flex-col bg-[#333333] hover:bg-black data-[state=expanded]:bg-[#262626] data-[selected=true]:bg-[#F78A09] group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-grey-700 group-data-[variant=floating]:shadow"
           >
             {children}
           </div>
@@ -269,14 +269,14 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("h-[36px] w-[36px]", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
       }}
       {...props}
     >
-      <PanelLeft />
+      <PanelLeft className="h-[18px] w-[18px] text-text-body1/75 hover:text-text-emphasize" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -531,6 +531,21 @@ const sidebarMenuButtonVariants = cva(
   }
 )
 
+const sidebarItemVariants = cva(
+  "flex items-center w-full px-4 transition-colors",
+  {
+    variants: {
+      variant: {
+        parent: "h-[36px] bg-grey-800 hover:bg-black data-[expanded=true]:bg-grey-900 data-[selected=true]:bg-primary data-[selected=true]:text-text-emphasize text-[18px]",
+        child: "h-[30px] bg-grey-900 hover:text-primary font-medium text-[14px]"
+      }
+    },
+    defaultVariants: {
+      variant: "parent"
+    }
+  }
+)
+
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button"> & {
@@ -560,7 +575,11 @@ const SidebarMenuButton = React.forwardRef<
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        className={cn(
+        sidebarItemVariants({ variant: "parent" }),
+        "relative flex items-center justify-start gap-2 rounded-none border-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-text-body1/85 hover:text-text-emphasize [&>svg]:size-[18px]",
+        className
+      )}
         {...props}
       />
     )
@@ -720,11 +739,10 @@ const SidebarMenuSubButton = React.forwardRef<
       data-size={size}
       data-active={isActive}
       className={cn(
-        "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+        sidebarItemVariants({ variant: "child" }),
+        "relative flex items-center justify-start gap-2 rounded-none border-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-text-body1/85 hover:text-text-emphasize [&>svg]:size-[14px] group-data-[collapsible=icon]:hidden",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
-        "group-data-[collapsible=icon]:hidden",
         className
       )}
       {...props}

@@ -25,13 +25,13 @@ const TableHeader = React.forwardRef<
     className={cn(
       "text-white divide-y divide-white/10",
       "[&_tr]:border-b border-white/10",
-      "[&_tr:first-child]:bg-table-header-primary",
-      "[&_tr:not(:first-child)]:bg-table-header-child-aqua/60",
-      "[&_tr:not(:first-child):nth-child(2n)]:bg-table-header-child-yellow/80",
-      "[&_tr:not(:first-child):nth-child(3n)]:bg-table-header-child-green/60",
-      "[&_tr:not(:first-child):nth-child(4n)]:bg-table-header-child-violet/60",
-      "[&_tr:not(:first-child):nth-child(5n)]:bg-table-header-child-turquoise/60",
-      "[&_tr:not(:first-child):nth-child(6n)]:bg-table-header-child-red/60",
+      "[&_tr:first-child]:bg-[hsl(var(--theme-table-header-primary))] dark:[&_tr:first-child]:bg-[hsl(var(--theme-table-header-alt))]",
+      "[&_tr:not(:first-child)]:bg-[hsl(var(--theme-table-header-child-aqua))]",
+      "[&_tr:not(:first-child):nth-child(2n)]:bg-[hsl(var(--theme-table-header-child-yellow))]",
+      "[&_tr:not(:first-child):nth-child(3n)]:bg-[hsl(var(--theme-table-header-child-green))]",
+      "[&_tr:not(:first-child):nth-child(4n)]:bg-[hsl(var(--theme-table-header-child-violet))]",
+      "[&_tr:not(:first-child):nth-child(5n)]:bg-[hsl(var(--theme-table-header-child-turquoise))]",
+      "[&_tr:not(:first-child):nth-child(6n)]:bg-[hsl(var(--theme-table-header-child-red))]",
       className
     )} 
     {...props} 
@@ -58,7 +58,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t bg-grey-100/50 font-medium [&>tr]:last:border-b-0 dark:bg-grey-800/50",
+      "border-t bg-[#F3F3F2]/50 font-medium [&>tr]:last:border-b-0 dark:bg-[#262626]/50",
       className
     )}
     {...props}
@@ -73,7 +73,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b border-grey-200 transition-colors hover:bg-grey-100/50 data-[state=selected]:bg-grey-100 dark:border-grey-700 dark:hover:bg-grey-800/50 dark:data-[state=selected]:bg-grey-800",
+      "border-b border-[#EFEFEF] transition-colors hover:bg-[#F2F2F2]/50 data-[state=selected]:bg-[#F2F2F2] dark:border-[#515151] dark:hover:bg-[#333333]/50 dark:data-[state=selected]:bg-[#333333]",
       className
     )}
     {...props}
